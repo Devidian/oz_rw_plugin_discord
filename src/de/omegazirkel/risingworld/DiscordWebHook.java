@@ -44,6 +44,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     static int logLevel = 0;
     static boolean postChat = false;
     static String webHookChatUrl = "";
+    static String joinDiscord = "";
 
     static boolean postSupport = false;
     static String webHookSupportUrl = "";
@@ -116,6 +117,12 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                 player.sendTextMessage("[#FFFF00]Your support ticket was sent to Discord!");
             } else {
                 player.sendTextMessage("[#FF0000]Discord support not available");
+            }
+        } else if (cmd[0].equals("/joinDiscord")) {
+            if(joinDiscord.isEmpty()){
+                player.sendTextMessage("[#FF0000]/joinDiscord not configured");
+            } else{
+                player.connectToDiscord("https://discord.gg/"+joinDiscord);
             }
         } else if (cmd[0].equals("/ozrestart")) {
             boolean canTriggerRestart = player.isAdmin() || (allowRestart && player.getTotalPlayTime() > restartMinimumTime && restartMinimumTime > 0);
@@ -209,7 +216,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     }
 
     /**
-     * 
+     *
      */
     @Override
     public void onDisable() {
@@ -278,6 +285,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 //            this.log(settings.getProperty("webHookUrl"),0);
             postChat = settings.getProperty("postChat").contentEquals("true");
             webHookChatUrl = settings.getProperty("webHookChatUrl");
+            joinDiscord = settings.getProperty("joinDiscord");
 
             postStatus = settings.getProperty("postStatus").contentEquals("true");
             reportStatusEnabled = settings.getProperty("reportStatusEnabled").contentEquals("true");
@@ -333,8 +341,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     }
 
     /**
-     * 
-     * @param filename 
+     *
+     * @param filename
      */
     @Override
     public void onFileChangeEvent(String filename) {

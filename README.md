@@ -6,9 +6,17 @@
 - Server neustart kann optional für Spieler aktiviert werden wenn sie eine bestimmte totalPlaytime aufweisen (echt-Zeit die sie auf dem Server verbracht haben)
 - Server erkennt updates in settings.properties und läd diese neu. Kann optional in den Discord status Kanal gepostet werden
 - Server erkennt Änderungen am JAR file und reagiert (wenn aktiviert) mit einem neustart des servers (oder aber setzt das restart flag falls noch spieler online sind) Wird im Spiel und optional in Discord reported
+- Spieler können mit /joinDiscord dem Discord des Servers beitreten sofern es konfiguriert wurde
 
 # Geplante Features:
 Aktuell keine weiteren
+
+# Befehle:
+|Command|Description|
+|---|---|
+|/support [text]|sends [text] as support message to Discord|
+|/ozrestart|set restart flag to shutdown server after last player has left|
+|/joinDiscord|join the servers Discord server| 
 
 # Build (Netbeans):
 2 Libraries müssen eingerichtet werden:
@@ -34,6 +42,7 @@ Die Datei settings.properties anpassen und nach deinen Wünschen anpassen
 | setting  |  default | description  |
 |---|---|---|
 |  logLevel |  0 | Logging to server console higher values means less output 0=all (debug)  |
+|joinDiscord||the code to join discord (not the full url!)|
 |  postChat |  false | if true, chat is posted to the webHook for Chat  |
 |  webHookChatUrl |   | this is the webHook used for ingame chat  |
 |  postStatus | false  | if true, server status messages like player login/out is send to the webHook for Status  |

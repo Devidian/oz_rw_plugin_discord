@@ -1,3 +1,6 @@
+Version 0.8.0
+• Neu: Spieler können jetzt mit /joinDiscord dem Discord des Servers beitreten sofern es konfiguriert wurde
+
 Version 0.7.1:
 • Projekt bereinigt für Github
 
