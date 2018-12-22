@@ -119,10 +119,10 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                 player.sendTextMessage("[#FF0000]Discord support not available");
             }
         } else if (cmd[0].equals("/joinDiscord")) {
-            if(joinDiscord.isEmpty()){
+            if (joinDiscord.isEmpty()) {
                 player.sendTextMessage("[#FF0000]/joinDiscord not configured");
-            } else{
-                player.connectToDiscord("https://discord.gg/"+joinDiscord);
+            } else {
+                player.connectToDiscord("https://discord.gg/" + joinDiscord);
             }
         } else if (cmd[0].equals("/ozrestart")) {
             boolean canTriggerRestart = player.isAdmin() || (allowRestart && player.getTotalPlayTime() > restartMinimumTime && restartMinimumTime > 0);
@@ -150,9 +150,11 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
      */
     @EventMethod
     public void onPlayerChat(PlayerChatEvent event) {
-        if (postChat) {
+        String message = event.getChatMessage();
+        
+        // better would be checking if ozgi is installed too
+        if (postChat && !message.startsWith("#")) {
             Player player = event.getPlayer();
-            String message = event.getChatMessage();
 
             String noColorText = message.replaceFirst("(\\[#[a-fA-F]+\\])", "");
             this.sendDiscordMessage(player.getName(), noColorText, webHookChatUrl);

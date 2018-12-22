@@ -1,18 +1,18 @@
-# Aktuelle Features:
-- Ingame-Chat in einen Discord-Kanal posten mit Ingame-Spielernamen
-- Logins/Logouts in einen Discord-Kanal posten
-- Support Anfragen die ingame per "/support [nachricht]" gesendet werden können
-- Jeder Discord Kanal (chat,support,status) kann über einen eigenen webHook gesendet werden
-- Server neustart durch Admin per /ozrestart nachdem alle Spieler ausgeloggt haben.
-- Server neustart kann optional für Spieler aktiviert werden wenn sie eine bestimmte totalPlaytime aufweisen (echt-Zeit die sie auf dem Server verbracht haben)
-- Server erkennt updates in settings.properties und läd diese neu. Kann optional in den Discord status Kanal gepostet werden
-- Server erkennt Änderungen am JAR file und reagiert (wenn aktiviert) mit einem neustart des servers (oder aber setzt das restart flag falls noch spieler online sind) Wird im Spiel und optional in Discord reported
-- Spieler können mit /joinDiscord dem Discord des Servers beitreten sofern es konfiguriert wurde
+# Current features:
+- post ingame chat to Discord with usernames
+- post server status messages such as login, logout, startup and shutdown to Discord 
+- post support messages using `/support [message]` to a Discord channel
+- every Discord channel can have its own webHook (chat, support and status)
+- admins can trigger server restart with `/ozrestart` that is executed after the last player left the server (it causes server shutdown, you need to be sure that server comes up automatically after that)
+- player can trigger server restart too (if you confgure it), but only if they have spent an amount of real-time on your server that you can define (default:1 day, if you play 2h a day you need 12 days to achive this)
+- plugin detects changes to settings.properties and reloads them. A message can be sent to discord if you like.
+- plugin detects changes to jar files and sets restart flag if you like. Can also report this to discord and ingame chat
+- players can type /joinDiscord to join your discord if you configure this
 
-# Geplante Features:
-Aktuell keine weiteren
+# Planned features:
+currently none
 
-# Befehle:
+# Commands:
 |Command|Description|
 |---|---|
 |/support [text]|sends [text] as support message to Discord|
@@ -20,13 +20,13 @@ Aktuell keine weiteren
 |/joinDiscord|join the servers Discord server| 
 
 # Build (Netbeans):
-2 Libraries müssen eingerichtet werden:
+2 Libraries must be configured:
 
 ## RisingWorldAPI
 https://forum.rising-world.net/thread/4743-getting-started/
 
 ## ApacheHttp
-Inhalt:
+Content:
 ```
 commons-logging-1.2.jar
 httpcore-4.4.10.jar
@@ -34,11 +34,11 @@ httpclient-4.5.6.jar
 ```
 https://hc.apache.org/downloads.cgi
 
-# Installation nach build:
-Einfach den dist Ordner in den Plugin Ordner verschieben, umbenennen und fertig!
+# Installation after build:
+just copy dist folder after build into your plugin folder and rename it, thats it!
 
-## Konfiguration
-Die Datei settings.properties anpassen und nach deinen Wünschen anpassen
+## Configuration
+The settings.properties contains all you need to configure this plugin
 
 | setting  |  default | description  |
 |---|---|---|
