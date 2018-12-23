@@ -133,7 +133,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                     username = server.getName();
                 }
                 this.sendDiscordMessage(username, player.getName() + " set restart flag. Server will shutdown after last player has left the server!", webHookStatusUrl);
-                getServer().broadcastTextMessage("[#FF8000]" + player.getName() + " set resart flag. Server will shutdown after last player has left the server!");
+                getServer().broadcastTextMessage("[#FF8000]" + player.getName() + " set restart flag. Server will shutdown after last player has left the server!");
                 flagRestart = true;
             } else {
                 player.sendTextMessage("[#FF0000]You are not allowed to trigger Server restart!");
@@ -371,7 +371,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 
                     if (server.getPlayerCount() > 0) {
                         this.sendDiscordMessage(username, filename + " has changed, restart flag set", webHookStatusUrl);
-                        getServer().broadcastTextMessage("[#FF8000][OZDP] Resart flag was set due to file changes (Plugin update). Server will shutdown after last player has left the server!");
+                        getServer().broadcastTextMessage("[#FF8000][OZDP] Restart flag was set due to file changes (Plugin update). Server will shutdown after last player has left the server!");
                     } else {
                         this.sendDiscordMessage(username, filename + " has changed, restarting server (no players online)", webHookStatusUrl);
                     }
