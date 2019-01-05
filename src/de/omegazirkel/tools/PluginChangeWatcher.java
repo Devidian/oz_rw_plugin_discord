@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PluginChangeWatcher {
 
     private final WatchService watcher;
-    private final Map keyPaths = new ConcurrentHashMap();
+    private final Map<WatchKey,Path> keyPaths = new ConcurrentHashMap<WatchKey,Path>();
     private volatile Thread processingThread;
     private final FileChangeListener fcl;
 

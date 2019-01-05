@@ -1,3 +1,9 @@
+Version 0.8.3
+- Project konvertiert zu Maven. Jetzt kann es auch in vscode weiterentwickelt werden!
+
+Version 0.8.2
+- Schlechschreibfehler
+
 Version 0.8.1
 - History und Readme gibts jetzt auch auf englisch
 - Fix: chat Nachrichten die mit # beginnen werden nicht in discord geschrieben (OZGI plugin)

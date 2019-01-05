@@ -19,23 +19,12 @@ currently none
 |/ozrestart|set restart flag to shutdown server after last player has left|
 |/joinDiscord|join the servers Discord server| 
 
-# Build (Netbeans):
-2 Libraries must be configured:
-
-## RisingWorldAPI
-https://forum.rising-world.net/thread/4743-getting-started/
-
-## ApacheHttp
-Content:
-```
-commons-logging-1.2.jar
-httpcore-4.4.10.jar
-httpclient-4.5.6.jar
-```
-https://hc.apache.org/downloads.cgi
+# Build (Maven):
+You have to create a new folder in your projects parent folder called `libs` and insert `PluginAPI.jar` from RisingWorld.
+See also: https://forum.rising-world.net/thread/4743-getting-started/
 
 # Installation after build:
-just copy dist folder after build into your plugin folder and rename it, thats it!
+just copy `dist/DiscordPlugin` folder after build into your plugin folder, thats it!
 
 ## Configuration
 The settings.properties contains all you need to configure this plugin

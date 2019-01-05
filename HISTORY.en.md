@@ -1,3 +1,9 @@
+Version 0.8.3
+- Project converted to Maven, now it can be build in vscode!
+
+Version 0.8.2
+- typos...
+
 Version 0.8.1
 - english translation for readme and history
 - Fix: chat messages that begin with # are not send to discord (See my other Plugin Global Intercom)

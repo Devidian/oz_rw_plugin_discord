@@ -250,6 +250,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                 username = username.substring(0, 31);
             }
             JSONObject json = new JSONObject();
+
             json.put("content", text);
             json.put("username", username);
 
