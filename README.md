@@ -12,12 +12,17 @@
 # Geplante Features:
 Aktuell keine weiteren
 
-# Befehle:
+# Befehle im Spiel:
 |Command|Description|
 |---|---|
 |/support [text]|sends [text] as support message to Discord|
 |/ozrestart|set restart flag to shutdown server after last player has left|
 |/joinDiscord|join the servers Discord server| 
+
+# Befehle discord:
+|Command|Description|
+|---|---|
+|/support [playername] [text]|sendet eine Nachricht an einen Spieler (muss online sein)|
 
 # Build (Maven):
 Für den build (package) prozess benötigt ihr im Übergeordneten Verzeichnis dieses Projekts einen Ordner `libs` mit der `PluginAPI.jar`
@@ -34,6 +39,9 @@ Die Datei settings.properties anpassen und nach deinen Wünschen anpassen
 | setting  |  default | description  |
 |---|---|---|
 |  logLevel |  0 | Logging to server console higher values means less output 0=all (debug)  |
+|botEnable|false|Enables usage of DiscordBot|
+|botSecure|true|Only Bot owner can use commands if `true`|
+|botToken||the token for your bot|
 |joinDiscord||the code to join discord (not the full url!)|
 |  postChat |  false | if true, chat is posted to the webHook for Chat  |
 |  webHookChatUrl |   | this is the webHook used for ingame chat  |

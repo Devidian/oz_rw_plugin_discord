@@ -12,12 +12,18 @@
 # Planned features:
 currently none
 
-# Commands:
+# Commands ingame:
 |Command|Description|
 |---|---|
 |/support [text]|sends [text] as support message to Discord|
 |/ozrestart|set restart flag to shutdown server after last player has left|
 |/joinDiscord|join the servers Discord server| 
+
+
+# Commands discord:
+|Command|Description|
+|---|---|
+|/support [playername] [text]|sends a text message to a player (must be online)|
 
 # Build (Maven):
 You have to create a new folder in your projects parent folder called `libs` and insert `PluginAPI.jar` from RisingWorld.
@@ -32,6 +38,9 @@ The settings.properties contains all you need to configure this plugin
 | setting  |  default | description  |
 |---|---|---|
 |  logLevel |  0 | Logging to server console higher values means less output 0=all (debug)  |
+|botEnable|false|Enables usage of DiscordBot|
+|botSecure|true|Only Bot owner can use commands if `true`|
+|botToken||the token for your bot|
 |joinDiscord||the code to join discord (not the full url!)|
 |  postChat |  false | if true, chat is posted to the webHook for Chat  |
 |  webHookChatUrl |   | this is the webHook used for ingame chat  |
