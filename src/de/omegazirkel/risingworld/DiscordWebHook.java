@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import net.risingworld.api.Plugin;
@@ -43,16 +46,16 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "0.9.0";
-	static final String pluginName = "DiscordPlugin";
+    static final String pluginVersion = "0.9.1";
+    static final String pluginName = "DiscordPlugin";
 
-	static final String colorError = "[#FF0000]";
-	static final String colorWarning = "[#808000]";
-	static final String colorOkay = "[#00FF00]";
-	static final String colorText = "[#EEEEEE]";
+    static final String colorError = "[#FF0000]";
+    static final String colorWarning = "[#808000]";
+    static final String colorOkay = "[#00FF00]";
+    static final String colorText = "[#EEEEEE]";
     static final String colorCommand = "[#997d4a]";
-    
-	static final String colorSupport = "[#782d8e]";
+
+    static final String colorSupport = "[#782d8e]";
 
     // Settings
     static int logLevel = 0;
@@ -120,27 +123,61 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
         Runnable ra = () -> {
             log("DiscordBot is enabled", 0);
             DiscordApi api = new DiscordApiBuilder().setToken(botToken).login().join();
+            Server server = getServer();
             api.addMessageCreateListener(event -> {
                 String content = event.getMessageContent();
                 MessageAuthor author = event.getMessageAuthor();
                 if (author.isUser() && !author.isYourself()) {
                     if (!botSecure || author.isBotOwner()) {
+                        if (content.contentEquals("!help")) {
+                            event.getChannel().sendMessage("Currently available commands:\n```\n"
+                                    + "!help                         | shows this message\n"
+                                    + "!online                       | shows a list of players that are currently online\n"
+                                    + "/restart                      | sets restart flag if there are any players online or executes shutdown server\n"
+                                    + "/support [PLAYERNAME] [TEXT]  | send a TEXT to PLAYERNAME as [SUPPORT] message\n"
+                                    + "```");
+                        }
 
-                        if (content.startsWith("/support")) {
+                        if (content.contentEquals("!online")) {
+                            int playersOnline = server.getPlayerCount();
+                            if (playersOnline == 0) {
+                                event.getChannel().sendMessage("No Players online");
+                            } else {
+                                List<String> list = Arrays.asList("Currently online:\n");
+                                StringBuilder sb = new StringBuilder();
+                                list.forEach(sb::append);
+                                server.getAllPlayers().forEach((Player p) -> {
+                                    sb.append(p.getName() + "\n");
+                                });
+                                event.getChannel().sendMessage(sb.toString());
+                            }
+                        } else if (content.startsWith("/support")) {
                             String[] parts = content.split(" ", 3);
                             if (parts.length < 3) {
                                 event.getChannel()
                                         .sendMessage("Wrong number of Arguments, use `/support PLAYERNAME TEXT...`");
-                                        return;
+                                return;
                             }
                             String playerName = parts[1];
-                            Player player = getServer().getPlayer(playerName);
+                            Player player = server.getPlayer(playerName);
                             if (player == null) {
                                 event.getChannel().sendMessage("Player with name " + playerName + " not online.");
                                 return;
                             }
 
-                            player.sendTextMessage(colorSupport+"[SUPPORT] "+author.getDisplayName()+": "+colorText+parts[2]);
+                            player.sendTextMessage(colorSupport + "[SUPPORT] " + author.getDisplayName() + ": "
+                                    + colorText + parts[2]);
+                        } else if (content.contentEquals("/restart")) {
+                            int playersLeft = server.getPlayerCount();
+                            if (playersLeft == 0) {
+                                event.getChannel().sendMessage("No Player online, executing shutdown");
+                                server.shutdown();
+                            } else {
+                                event.getChannel().sendMessage(playersLeft + " Player(s) online, restart flag set");
+                                getServer().broadcastTextMessage("[#FF8000]" + author.getDiscriminatedName()
+                                        + " set restart flag. Server will shutdown after last player has left the server!");
+                                flagRestart = true;
+                            }
                         }
                     }
                 }
@@ -414,8 +451,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
      * @param filename
      */
     @Override
-    public void onFileChangeEvent(String filename) {
-        if (filename.equals("settings.properties")) {
+    public void onFileChangeEvent(Path file) {
+        if (file.getFileName().equals("settings.properties")) {
             log("Settings file was changed, reloading settings now", 10);
             if (reportSettingsChanged) {
                 Server server = getServer();
@@ -426,8 +463,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                 this.sendDiscordMessage(username, "settings.properties has changed, reloading", webHookStatusUrl);
             }
             this.initSettings();
-        } else if (filename.endsWith("jar")) {
-            log(filename + " file was changed, set restart flag (or restart if no player online)", 10);
+        } else if (file.endsWith("jar")) {
+            log(file.getFileName() + " file was changed, set restart flag (or restart if no player online)", 10);
             Server server = getServer();
             if (reportJarChanged) {
                 String username = statusUsername;
@@ -437,17 +474,17 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                 if (restartOnUpdate) {
 
                     if (server.getPlayerCount() > 0) {
-                        this.sendDiscordMessage(username, filename + " has changed, restart flag set",
+                        this.sendDiscordMessage(username, file.getFileName() + " has changed, restart flag set",
                                 webHookStatusUrl);
                         getServer().broadcastTextMessage(
                                 "[#FF8000][OZDP] Restart flag was set due to file changes (Plugin update). Server will shutdown after last player has left the server!");
                     } else {
                         this.sendDiscordMessage(username,
-                                filename + " has changed, restarting server (no players online)", webHookStatusUrl);
+                                file.getFileName() + " has changed, restarting server (no players online)", webHookStatusUrl);
                     }
 
                 } else {
-                    this.sendDiscordMessage(username, filename + " has changed, but restartOnUpdate is false",
+                    this.sendDiscordMessage(username, file.getFileName() + " has changed, but restartOnUpdate is false",
                             webHookStatusUrl);
                 }
             }
@@ -459,7 +496,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                 }
             }
         } else {
-            log("File changed: " + filename, 0);
+            log("File changed: <" + file.getFileName() + ">", 0);
         }
     }
 }

@@ -1,3 +1,9 @@
+### Version 0.9.1
+- Neuer Discord Befehl: `/restart` setzt das restart flag falls Spieler online sind oder macht einen shutdown falls nicht.
+- Neuer Discord Befehl: `!online` Zeigt eine Liste mit Spielern die online sind
+- Neuer Discord Befehl: `!help` Zeigt eine Liste mit Kommandos die über Discord verfügbar sind
+- Behoben: Plugin update Überwachung war fehlerhaft
+
 ### Version 0.9.0
 - Neu: JavaCord integriert. Jetzt kann optional ein DiscordBot token hinterlegt werden. Über diesen kann man dann Befehle von Discord an den Server senden (in dieser Version nur /support)
 - Neu: Discord Befehl `/support SPIELERNAME TEXT...` um einem Spieler auf dem Server zu schreiben

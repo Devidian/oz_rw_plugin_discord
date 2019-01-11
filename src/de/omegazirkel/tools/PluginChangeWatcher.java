@@ -38,7 +38,7 @@ public class PluginChangeWatcher {
     public PluginChangeWatcher(FileChangeListener fcl) throws IOException {
         this.fcl = fcl;
         this.watcher = FileSystems.getDefault().newWatchService();
-        System.out.println("[OZT] Start WatchUpdates");
+        System.out.println("[OZ.Tools] Start WatchUpdates");
     }
 
     /**
@@ -51,7 +51,7 @@ public class PluginChangeWatcher {
                 try {
                     processFileNotifications();
                 } catch (InterruptedException ex) {
-                    System.out.println("[OZT] EX " + ex.getMessage());
+                    System.out.println("[OZ.Tools] EX " + ex.getMessage());
                     processingThread = null;
                 }
             }
@@ -77,7 +77,7 @@ public class PluginChangeWatcher {
      */
     public void watchDir(File dir) throws IOException {
         Path p = dir.toPath();
-        System.out.println("[OZT] register " + p);
+        System.out.println("[OZ.Tools] register " + p);
         WatchKey key = p.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         keyPaths.put(key, p);
     }
@@ -112,7 +112,7 @@ public class PluginChangeWatcher {
      */
     private void process(Path dir, Path file, WatchEvent.Kind evtType) {
         if(evtType == ENTRY_MODIFY){
-            fcl.onFileChangeEvent(file.toString());
+            fcl.onFileChangeEvent(file);
         }
     }
 }

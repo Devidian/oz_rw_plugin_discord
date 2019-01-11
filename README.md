@@ -23,6 +23,8 @@ Aktuell keine weiteren
 |Command|Description|
 |---|---|
 |/support [playername] [text]|sendet eine Nachricht an einen Spieler (muss online sein)|
+|/restart|set restart flag to shutdown server after last player has left|
+|!online|lists all players that are currently online|
 
 # Build (Maven):
 Für den build (package) prozess benötigt ihr im Übergeordneten Verzeichnis dieses Projekts einen Ordner `libs` mit der `PluginAPI.jar`

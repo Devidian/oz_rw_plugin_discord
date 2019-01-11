@@ -5,11 +5,13 @@
  */
 package de.omegazirkel.tools;
 
+import java.nio.file.Path;
+
 /**
  *
  * @author Maik
  */
 public interface FileChangeListener {
 
-    public void onFileChangeEvent(String filename);
+    public void onFileChangeEvent(Path file);
 }

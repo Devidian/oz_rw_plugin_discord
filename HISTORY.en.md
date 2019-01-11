@@ -1,3 +1,10 @@
+### Version 0.9.1
+- New Discord command: `/restart` set restart flag if there is atleast one player online, shutdown server if not
+- New Discord command: `!online` prints a list of players currently online
+- New Discord command: `!help` prints a list of commands available in discord
+- Fixed: Plugin update watcher was broken
+
+
 ### Version 0.9.0
 - New: JavaCord integrated. Now it is possible to activate a discord bot to send commands from discord to your server (for now only /support)
 - New: Discord command `/support PLAYERNAME TEXT...` to send a (support) message to a player
