@@ -1,3 +1,16 @@
+### Version 0.10.0
+- New: local chat has now a prefix `[LOCAL]`
+- New: It the Discord-Bot is member of a Discord channel named `server-chat`, it will send all messages that are not commands to the ingame chat
+- New: 3 different prefix colors for `[LOCAL]`
+  - chat from other (ingame) player
+  - chat from discord
+  - your own chat messages
+
+### Version 0.9.2
+- Changed: Only commands starting with / are secure, all commands starting with ! can now executed by everyone else
+- Fixed: GlobalIntercom Messages will now filtered and not send to Discord through the webhook
+- **IMPORTANT: If GlobalIntercom is installed, the version must be >= 0.7.2 in order to work**
+
 ### Version 0.9.1
 - New Discord command: `/restart` set restart flag if there is atleast one player online, shutdown server if not
 - New Discord command: `!online` prints a list of players currently online
@@ -38,7 +51,7 @@
 
 ### Version 0.5.0:
 - Fix: Messages with utf8 characters can now be send (was not correctly sent as utf8)
-- New: with `/ozrestart` an Admin can set a restart flag that will shutdown the server as soon as the last player left the server. 
+- New: with `/ozrestart` an Admin can set a restart flag that will shutdown the server as soon as the last player left the server.
 WARNING: only use this if your server comes back automatically
 
 ### Version 0.4.0:

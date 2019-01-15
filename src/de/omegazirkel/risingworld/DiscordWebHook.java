@@ -37,6 +37,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.json.simple.JSONObject;
 
@@ -46,7 +48,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-    static final String pluginVersion = "0.9.1";
+    static final String pluginVersion = "0.10.0";
     static final String pluginName = "DiscordPlugin";
 
     static final String colorError = "[#FF0000]";
@@ -56,6 +58,9 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     static final String colorCommand = "[#997d4a]";
 
     static final String colorSupport = "[#782d8e]";
+    static final String colorLocalSelf = "[#ddffdd]";
+    static final String colorLocalOther = "[#dddddd]";
+    static final String colorLocalDiscord = "[#ddddff]";
 
     // Settings
     static int logLevel = 0;
@@ -84,6 +89,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     static boolean botEnable = false;
     static boolean botSecure = true;
     static String botToken = "";
+    static String botChatChannelName = "server-chat";
 
     static boolean allowRestart = false;
     static boolean restartOnUpdate = true;
@@ -92,11 +98,16 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     // END Settings
     // Live properties
     static boolean flagRestart = false;
+    static Plugin GlobalIntercom = null;
 
     @Override
     public void onEnable() {
         // Register event listener
         registerEventListener(this);
+        GlobalIntercom = getPluginByName("Omega Zirkel Global Intercom Plugin");
+        if (GlobalIntercom != null) {
+            log("Global Intercom found! ID: " + GlobalIntercom.getID(), 0);
+        }
         this.initSettings();
         if (reportStatusEnabled) {
             Server server = getServer();
@@ -127,41 +138,27 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
             api.addMessageCreateListener(event -> {
                 String content = event.getMessageContent();
                 MessageAuthor author = event.getMessageAuthor();
-                if (author.isUser() && !author.isYourself()) {
-                    if (!botSecure || author.isBotOwner()) {
-                        if (content.contentEquals("!help")) {
-                            event.getChannel().sendMessage("Currently available commands:\n```\n"
-                                    + "!help                         | shows this message\n"
-                                    + "!online                       | shows a list of players that are currently online\n"
-                                    + "/restart                      | sets restart flag if there are any players online or executes shutdown server\n"
-                                    + "/support [PLAYERNAME] [TEXT]  | send a TEXT to PLAYERNAME as [SUPPORT] message\n"
-                                    + "```");
-                        }
+                TextChannel channel = event.getChannel();
+                boolean isUserNotBot = author.isUser() && !author.isYourself();
+                if (!isUserNotBot) {
+                    return; // Do not react to Bot messages
+                }
+                boolean isSecureCommand = content.startsWith("/");
+                boolean isCommand = content.startsWith("!");
+                boolean canExecuteSecureCommands = !botSecure || author.isBotOwner();
 
-                        if (content.contentEquals("!online")) {
-                            int playersOnline = server.getPlayerCount();
-                            if (playersOnline == 0) {
-                                event.getChannel().sendMessage("No Players online");
-                            } else {
-                                List<String> list = Arrays.asList("Currently online:\n");
-                                StringBuilder sb = new StringBuilder();
-                                list.forEach(sb::append);
-                                server.getAllPlayers().forEach((Player p) -> {
-                                    sb.append(p.getName() + "\n");
-                                });
-                                event.getChannel().sendMessage(sb.toString());
-                            }
-                        } else if (content.startsWith("/support")) {
+                if (isSecureCommand) {
+                    if (canExecuteSecureCommands) {
+                        if (content.startsWith("/support")) {
                             String[] parts = content.split(" ", 3);
                             if (parts.length < 3) {
-                                event.getChannel()
-                                        .sendMessage("Wrong number of Arguments, use `/support PLAYERNAME TEXT...`");
+                                channel.sendMessage("Wrong number of Arguments, use `/support PLAYERNAME TEXT...`");
                                 return;
                             }
                             String playerName = parts[1];
                             Player player = server.getPlayer(playerName);
                             if (player == null) {
-                                event.getChannel().sendMessage("Player with name " + playerName + " not online.");
+                                channel.sendMessage("Player with name " + playerName + " not online.");
                                 return;
                             }
 
@@ -170,15 +167,47 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                         } else if (content.contentEquals("/restart")) {
                             int playersLeft = server.getPlayerCount();
                             if (playersLeft == 0) {
-                                event.getChannel().sendMessage("No Player online, executing shutdown");
+                                channel.sendMessage("No Player online, executing shutdown");
                                 server.shutdown();
                             } else {
-                                event.getChannel().sendMessage(playersLeft + " Player(s) online, restart flag set");
+                                channel.sendMessage(playersLeft + " Player(s) online, restart flag set");
                                 getServer().broadcastTextMessage("[#FF8000]" + author.getDiscriminatedName()
                                         + " set restart flag. Server will shutdown after last player has left the server!");
                                 flagRestart = true;
                             }
                         }
+                    } else {
+                        channel.sendMessage(
+                                "You are not allowed to execute secure commands. Type `!help` for more info");
+                    }
+                } else if (isCommand) {
+                    if (content.contentEquals("!help")) {
+                        channel.sendMessage("Currently available commands:\n```\n"
+                                + "!help                         | shows this message\n"
+                                + "!online                       | shows a list of players that are currently online\n"
+                                + "SECURE COMMANDS:\n"
+                                + "/restart                      | sets restart flag if there are any players online or executes shutdown server\n"
+                                + "/support [PLAYERNAME] [TEXT]  | send a TEXT to PLAYERNAME as [SUPPORT] message\n"
+                                + "```");
+                    } else if (content.contentEquals("!online")) {
+                        int playersOnline = server.getPlayerCount();
+                        if (playersOnline == 0) {
+                            channel.sendMessage("No Players online");
+                        } else {
+                            List<String> list = Arrays.asList("Currently online:\n");
+                            StringBuilder sb = new StringBuilder();
+                            list.forEach(sb::append);
+                            server.getAllPlayers().forEach((Player p) -> {
+                                sb.append(p.getName() + "\n");
+                            });
+                            channel.sendMessage(sb.toString());
+                        }
+                    }
+                } else {
+                    // Not a (secure) command, maybe chat? check channel
+                    String chName = event.getChannel().asServerChannel().map(ServerChannel::getName).orElse(null);
+                    if(chName.equalsIgnoreCase(botChatChannelName)){
+                        server.broadcastTextMessage(colorLocalDiscord+"[LOCAL] "+author.getDiscriminatedName()+": "+colorText+content);
                     }
                 }
             });
@@ -245,17 +274,41 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
      */
     @EventMethod
     public void onPlayerChat(PlayerChatEvent event) {
+
         String message = event.getChatMessage();
+        String noColorText = message.replaceFirst("(\\[#[a-fA-F]+\\])", "");
+        Boolean processMessage = postChat;
 
-        // better would be checking if ozgi is installed too
-        if (postChat && !message.startsWith("#")) {
-            Player player = event.getPlayer();
-
-            String noColorText = message.replaceFirst("(\\[#[a-fA-F]+\\])", "");
-            this.sendDiscordMessage(player.getName(), noColorText, webHookChatUrl);
+        if (!processMessage) {
+            return;
         }
 
+        if (GlobalIntercom != null) {
+            processMessage = !((GlobalIntercom) GlobalIntercom).isGIMessage(event);
+        }
+
+        if (processMessage) {
+            Player player = event.getPlayer();
+            this.sendDiscordMessage(player.getName(), noColorText, webHookChatUrl);
+            broadcastMessage(player,noColorText);
+        }
     }
+
+    /**
+     *
+     * @param eventPlayer
+     * @param noColorText
+     */
+    private void broadcastMessage(Player eventPlayer,String noColorText) {
+		getServer().getAllPlayers().forEach((player) -> {
+			String color = colorLocalOther;
+			if (player.getUID() == eventPlayer.getUID()) {
+				color = colorLocalSelf;
+			}
+
+            player.sendTextMessage(color+"[LOCAL] "+player.getName()+": "+colorText+noColorText);
+		});
+	}
 
     /**
      *
@@ -480,7 +533,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                                 "[#FF8000][OZDP] Restart flag was set due to file changes (Plugin update). Server will shutdown after last player has left the server!");
                     } else {
                         this.sendDiscordMessage(username,
-                                file.getFileName() + " has changed, restarting server (no players online)", webHookStatusUrl);
+                                file.getFileName() + " has changed, restarting server (no players online)",
+                                webHookStatusUrl);
                     }
 
                 } else {

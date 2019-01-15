@@ -1,3 +1,16 @@
+### Version 0.10.0
+- Neu: Lokaler Chat hat jetzt das Präfix `[LOCAL]`
+- Neu: Wenn der Discord-Bot in einem Discord Kanal `server-chat` Mitglied ist, sendet er text der kein Befeh ist ins Spiel
+- Neu: 3 verschiedene Farben für `[LOCAL]`
+  - Für Text von anderen
+  - Für Text aus Discord
+  - Für Text den man selber geschrieben hat
+
+### Version 0.9.2
+- Geändert: nur Befehle die mit / beginnen sind als "sicher" markiert, Befehle die mit ! beginnen kann jeder ausführen.
+- Behoben: GlobalIntercom Meldungen werden nicht mehr als chat über den WebHook gesendet wenn GlobalIntercom installiert ist.
+- **WICHTIG: Wenn GlobalIntercom installiert ist, dann muss die Version >= 0.7.2 sein**
+
 ### Version 0.9.1
 - Neuer Discord Befehl: `/restart` setzt das restart flag falls Spieler online sind oder macht einen shutdown falls nicht.
 - Neuer Discord Befehl: `!online` Zeigt eine Liste mit Spielern die online sind
