@@ -10,10 +10,9 @@ import de.omegazirkel.tools.PluginChangeWatcher;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
 import net.risingworld.api.Plugin;
@@ -32,14 +31,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.javacord.api.DiscordApi;
-import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.MessageAuthor;
 import org.json.simple.JSONObject;
 
 /**
@@ -48,7 +43,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-    static final String pluginVersion = "0.10.0";
+    static final String pluginVersion = "0.10.1";
     static final String pluginName = "DiscordPlugin";
 
     static final String colorError = "[#FF0000]";
@@ -99,6 +94,30 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     // Live properties
     static boolean flagRestart = false;
     static Plugin GlobalIntercom = null;
+    static JavaCordBot DiscordBot = null;
+
+    // getter
+    public String getBotToken(){
+        return botToken;
+    }
+    public boolean getBotSecure(){
+        return botSecure;
+    }
+    public String getColorSupport(){
+        return colorSupport;
+    }
+    public String getColorText(){
+        return colorText;
+    }
+    public void setFlagRestart(boolean value){
+        flagRestart = value;
+    }
+    public String getBotChatChannelName(){
+        return botChatChannelName;
+    }
+    public String getColorLocalDiscord(){
+        return colorLocalDiscord;
+    }
 
     @Override
     public void onEnable() {
@@ -131,88 +150,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
             log("DiscordBot is disabled", 0);
             return;
         }
-        Runnable ra = () -> {
-            log("DiscordBot is enabled", 0);
-            DiscordApi api = new DiscordApiBuilder().setToken(botToken).login().join();
-            Server server = getServer();
-            api.addMessageCreateListener(event -> {
-                String content = event.getMessageContent();
-                MessageAuthor author = event.getMessageAuthor();
-                TextChannel channel = event.getChannel();
-                boolean isUserNotBot = author.isUser() && !author.isYourself();
-                if (!isUserNotBot) {
-                    return; // Do not react to Bot messages
-                }
-                boolean isSecureCommand = content.startsWith("/");
-                boolean isCommand = content.startsWith("!");
-                boolean canExecuteSecureCommands = !botSecure || author.isBotOwner();
-
-                if (isSecureCommand) {
-                    if (canExecuteSecureCommands) {
-                        if (content.startsWith("/support")) {
-                            String[] parts = content.split(" ", 3);
-                            if (parts.length < 3) {
-                                channel.sendMessage("Wrong number of Arguments, use `/support PLAYERNAME TEXT...`");
-                                return;
-                            }
-                            String playerName = parts[1];
-                            Player player = server.getPlayer(playerName);
-                            if (player == null) {
-                                channel.sendMessage("Player with name " + playerName + " not online.");
-                                return;
-                            }
-
-                            player.sendTextMessage(colorSupport + "[SUPPORT] " + author.getDisplayName() + ": "
-                                    + colorText + parts[2]);
-                        } else if (content.contentEquals("/restart")) {
-                            int playersLeft = server.getPlayerCount();
-                            if (playersLeft == 0) {
-                                channel.sendMessage("No Player online, executing shutdown");
-                                server.shutdown();
-                            } else {
-                                channel.sendMessage(playersLeft + " Player(s) online, restart flag set");
-                                getServer().broadcastTextMessage("[#FF8000]" + author.getDiscriminatedName()
-                                        + " set restart flag. Server will shutdown after last player has left the server!");
-                                flagRestart = true;
-                            }
-                        }
-                    } else {
-                        channel.sendMessage(
-                                "You are not allowed to execute secure commands. Type `!help` for more info");
-                    }
-                } else if (isCommand) {
-                    if (content.contentEquals("!help")) {
-                        channel.sendMessage("Currently available commands:\n```\n"
-                                + "!help                         | shows this message\n"
-                                + "!online                       | shows a list of players that are currently online\n"
-                                + "SECURE COMMANDS:\n"
-                                + "/restart                      | sets restart flag if there are any players online or executes shutdown server\n"
-                                + "/support [PLAYERNAME] [TEXT]  | send a TEXT to PLAYERNAME as [SUPPORT] message\n"
-                                + "```");
-                    } else if (content.contentEquals("!online")) {
-                        int playersOnline = server.getPlayerCount();
-                        if (playersOnline == 0) {
-                            channel.sendMessage("No Players online");
-                        } else {
-                            List<String> list = Arrays.asList("Currently online:\n");
-                            StringBuilder sb = new StringBuilder();
-                            list.forEach(sb::append);
-                            server.getAllPlayers().forEach((Player p) -> {
-                                sb.append(p.getName() + "\n");
-                            });
-                            channel.sendMessage(sb.toString());
-                        }
-                    }
-                } else {
-                    // Not a (secure) command, maybe chat? check channel
-                    String chName = event.getChannel().asServerChannel().map(ServerChannel::getName).orElse(null);
-                    if(chName.equalsIgnoreCase(botChatChannelName)){
-                        server.broadcastTextMessage(colorLocalDiscord+"[LOCAL] "+author.getDiscriminatedName()+": "+colorText+content);
-                    }
-                }
-            });
-        };
-        ra.run();
+        DiscordBot = new JavaCordBot(this);
+        DiscordBot.run();
     }
 
     @EventMethod
@@ -291,6 +230,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
             Player player = event.getPlayer();
             this.sendDiscordMessage(player.getName(), noColorText, webHookChatUrl);
             broadcastMessage(player,noColorText);
+            event.setCancelled(true);
         }
     }
 
@@ -382,6 +322,9 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
             }
             this.sendDiscordMessage(username, statusDisabledMessage, webHookStatusUrl);
         }
+        if (botEnable) {
+            DiscordBot.disconnect();
+        }
     }
 
     /**
@@ -405,6 +348,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 
             json.put("content", text);
             json.put("username", username);
+            String avatar_url = "https://api.adorable.io/avatars/128/"+username.replace(" ", "%20");
+            json.put("avatar_url", avatar_url);
 
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpPost post = new HttpPost(channel);
@@ -493,7 +438,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
      * @param text  the message to print in server logs
      * @param level message level higher level means higher priority
      */
-    private static void log(String text, int level) {
+    public static void log(String text, int level) {
         if (level >= logLevel) {
             System.out.println("[OZ.DP] " + text);
         }
@@ -505,7 +450,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
      */
     @Override
     public void onFileChangeEvent(Path file) {
-        if (file.getFileName().equals("settings.properties")) {
+        if (file.toString().endsWith("settings.properties")) {
             log("Settings file was changed, reloading settings now", 10);
             if (reportSettingsChanged) {
                 Server server = getServer();
@@ -516,8 +461,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                 this.sendDiscordMessage(username, "settings.properties has changed, reloading", webHookStatusUrl);
             }
             this.initSettings();
-        } else if (file.endsWith("jar")) {
-            log(file.getFileName() + " file was changed, set restart flag (or restart if no player online)", 10);
+        } else if (file.toString().endsWith("jar")) {
+            log(file + " file was changed, set restart flag (or restart if no player online)", 10);
             Server server = getServer();
             if (reportJarChanged) {
                 String username = statusUsername;
@@ -550,7 +495,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                 }
             }
         } else {
-            log("File changed: <" + file.getFileName() + ">", 0);
+            log("File changed: <" + file + ">", 0);
         }
     }
 }

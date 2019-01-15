@@ -1,3 +1,10 @@
+### Version 0.10.1
+- Fixed: Ingame chat message was displayed twice
+- added: `avatar_url` to webhook message
+- changed: moved JavaCord to its own class
+- fixed: JavaCord listener will now be correctly removed on plugin disable (shutdown)
+- fixed: automatic update (restart) was still broken, should work now - finally
+
 ### Version 0.10.0
 - New: local chat has now a prefix `[LOCAL]`
 - New: It the Discord-Bot is member of a Discord channel named `server-chat`, it will send all messages that are not commands to the ingame chat

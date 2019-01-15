@@ -19,6 +19,8 @@ import java.nio.file.WatchService;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import de.omegazirkel.risingworld.DiscordWebHook;
+
 /**
  *
  * @author Maik *Devidian* Laschober
@@ -111,8 +113,12 @@ public class PluginChangeWatcher {
      * @param evtType 
      */
     private void process(Path dir, Path file, WatchEvent.Kind evtType) {
-        if(evtType == ENTRY_MODIFY){
+        // if(evtType == ENTRY_MODIFY){
+        //     fcl.onFileChangeEvent(file);
+        // }
+        if(evtType == ENTRY_CREATE && !file.toString().startsWith(".")){
             fcl.onFileChangeEvent(file);
         }
+        // DiscordWebHook.log("File change: "+file+" \tEvent Type: "+evtType,0);
     }
 }

@@ -1,3 +1,10 @@
+### Version 0.10.1
+- Behoben: Ingame Chat Nachricht wurde doppelt angezeigt
+- Hinzugefügt: `avatar_url` zur webhook message
+- Geändert: JavaCord in eigene Klasse verschoben
+- Behoben: JavaCord listener wird beim shutdown correct entfernt
+- Behoben: der automatische update prozess war immer noch kaputt, geht jetzt wieder
+
 ### Version 0.10.0
 - Neu: Lokaler Chat hat jetzt das Präfix `[LOCAL]`
 - Neu: Wenn der Discord-Bot in einem Discord Kanal `server-chat` Mitglied ist, sendet er text der kein Befeh ist ins Spiel
