@@ -10,6 +10,7 @@ import de.omegazirkel.tools.PluginChangeWatcher;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
@@ -43,7 +44,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-    static final String pluginVersion = "0.10.1";
+    static final String pluginVersion = "0.10.2";
     static final String pluginName = "DiscordPlugin";
 
     static final String colorError = "[#FF0000]";
@@ -84,6 +85,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     static boolean botEnable = false;
     static boolean botSecure = true;
     static String botToken = "";
+    static String botLang = "en";
     static String botChatChannelName = "server-chat";
 
     static boolean allowRestart = false;
@@ -97,25 +99,35 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     static JavaCordBot DiscordBot = null;
 
     // getter
-    public String getBotToken(){
+    public String getBotToken() {
         return botToken;
     }
-    public boolean getBotSecure(){
+
+    public String getBotLanguage() {
+        return botLang;
+    }
+
+    public boolean getBotSecure() {
         return botSecure;
     }
-    public String getColorSupport(){
+
+    public String getColorSupport() {
         return colorSupport;
     }
-    public String getColorText(){
+
+    public String getColorText() {
         return colorText;
     }
-    public void setFlagRestart(boolean value){
+
+    public void setFlagRestart(boolean value) {
         flagRestart = value;
     }
-    public String getBotChatChannelName(){
+
+    public String getBotChatChannelName() {
         return botChatChannelName;
     }
-    public String getColorLocalDiscord(){
+
+    public String getColorLocalDiscord() {
         return colorLocalDiscord;
     }
 
@@ -229,7 +241,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
         if (processMessage) {
             Player player = event.getPlayer();
             this.sendDiscordMessage(player.getName(), noColorText, webHookChatUrl);
-            broadcastMessage(player,noColorText);
+            broadcastMessage(player, noColorText);
             event.setCancelled(true);
         }
     }
@@ -239,16 +251,16 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
      * @param eventPlayer
      * @param noColorText
      */
-    private void broadcastMessage(Player eventPlayer,String noColorText) {
-		getServer().getAllPlayers().forEach((player) -> {
-			String color = colorLocalOther;
-			if (player.getUID() == eventPlayer.getUID()) {
-				color = colorLocalSelf;
-			}
+    private void broadcastMessage(Player eventPlayer, String noColorText) {
+        getServer().getAllPlayers().forEach((player) -> {
+            String color = colorLocalOther;
+            if (player.getUID() == eventPlayer.getUID()) {
+                color = colorLocalSelf;
+            }
 
-            player.sendTextMessage(color+"[LOCAL] "+player.getName()+": "+colorText+noColorText);
-		});
-	}
+            player.sendTextMessage(color + "[LOCAL] " + player.getName() + ": " + colorText + noColorText);
+        });
+    }
 
     /**
      *
@@ -348,7 +360,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 
             json.put("content", text);
             json.put("username", username);
-            String avatar_url = "https://api.adorable.io/avatars/128/"+username.replace(" ", "%20");
+            String avatar_url = "https://api.adorable.io/avatars/128/" + username.replace(" ", "%20");
             json.put("avatar_url", avatar_url);
 
             HttpClient httpClient = HttpClientBuilder.create().build();
@@ -378,7 +390,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
         FileInputStream in;
         try {
             in = new FileInputStream(getPath() + "/settings.properties");
-            settings.load(in);
+            settings.load(new InputStreamReader(in,"UTF8"));
             in.close();
             // fill global values
             logLevel = Integer.parseInt(settings.getProperty("logLevel"));
@@ -405,6 +417,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
             botEnable = settings.getProperty("botEnable").contentEquals("true");
             botSecure = settings.getProperty("botSecure").contentEquals("true");
             botToken = settings.getProperty("botToken");
+            botLang = settings.getProperty("botLang", "en");
 
             // motd settings
             sendMOTD = settings.getProperty("sendMOTD").contentEquals("true");
@@ -449,19 +462,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
      * @param filename
      */
     @Override
-    public void onFileChangeEvent(Path file) {
-        if (file.toString().endsWith("settings.properties")) {
-            log("Settings file was changed, reloading settings now", 10);
-            if (reportSettingsChanged) {
-                Server server = getServer();
-                String username = statusUsername;
-                if (useServerName) {
-                    username = server.getName();
-                }
-                this.sendDiscordMessage(username, "settings.properties has changed, reloading", webHookStatusUrl);
-            }
-            this.initSettings();
-        } else if (file.toString().endsWith("jar")) {
+    public void onFileCreateEvent(Path file) {
+        if (file.toString().endsWith("jar")) {
             log(file + " file was changed, set restart flag (or restart if no player online)", 10);
             Server server = getServer();
             if (reportJarChanged) {
@@ -496,6 +498,22 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
             }
         } else {
             log("File changed: <" + file + ">", 0);
+        }
+    }
+
+    @Override
+    public void onFileChangeEvent(Path file) {
+        if (file.toString().endsWith("settings.properties")) {
+            log("Settings file was changed, reloading settings now", 10);
+            if (reportSettingsChanged) {
+                Server server = getServer();
+                String username = statusUsername;
+                if (useServerName) {
+                    username = server.getName();
+                }
+                this.sendDiscordMessage(username, "settings.properties has changed, reloading", webHookStatusUrl);
+            }
+            this.initSettings();
         }
     }
 }

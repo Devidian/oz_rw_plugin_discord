@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.omegazirkel.risingworld</groupId>
     <artifactId>DiscordPlugin</artifactId>
-    <version>0.10.1-SNAPSHOT</version>
+    <version>0.10.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <dependencyManagement>
         <dependencies>
@@ -79,13 +79,13 @@
                     <include>*.yml</include>
                 </includes>
             </resource>
-            <resource>
+            <!-- <resource>
                 <targetPath></targetPath>
                 <directory>${basedir}/src</directory>
                 <includes>
                     <include>*.properties</include>
                 </includes>
-            </resource>
+            </resource> -->
         </resources>
         <plugins>
             <plugin>
@@ -140,6 +140,24 @@
                                     <directory>${basedir}</directory>
                                     <includes>
                                         <include>*.md</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resource-two</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/dist/${project.artifactId}/i18n</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>/src/i18n</directory>
+                                    <includes>
+                                        <include>*.properties</include>
                                     </includes>
                                 </resource>
                             </resources>

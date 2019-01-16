@@ -113,11 +113,11 @@ public class PluginChangeWatcher {
      * @param evtType 
      */
     private void process(Path dir, Path file, WatchEvent.Kind evtType) {
-        // if(evtType == ENTRY_MODIFY){
-        //     fcl.onFileChangeEvent(file);
-        // }
-        if(evtType == ENTRY_CREATE && !file.toString().startsWith(".")){
+        if(evtType == ENTRY_MODIFY){
             fcl.onFileChangeEvent(file);
+        }
+        if(evtType == ENTRY_CREATE && !file.toString().startsWith(".")){
+            fcl.onFileCreateEvent(file);
         }
         // DiscordWebHook.log("File change: "+file+" \tEvent Type: "+evtType,0);
     }

@@ -1,3 +1,14 @@
+### Version 0.10.2
+- New Discord command: `!version` shows current plugin version
+- New Discord command: `/kick` to kick a player
+- New Discord command: `/ban` to ban a player
+- New Discord command: `/group` to change player group
+- New Discord command: `/bc` to broadcast a message to all player
+- New Discord command: `/yell` to yell a message to all player
+- **TYPE !help for correct syntax of new commands**
+- fixed: properties files were not correctly loaded with UTF8
+- New: i18n class for translation (default: en) can be changed in settings with `botLang=`. Currently only works with `!help`, will be expanded in further updates. Currently only `de` and `en` are available (translators for other languages are welcome!)
+
 ### Version 0.10.1
 - Fixed: Ingame chat message was displayed twice
 - added: `avatar_url` to webhook message

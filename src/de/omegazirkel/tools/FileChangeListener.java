@@ -14,5 +14,5 @@ import java.nio.file.Path;
 public interface FileChangeListener {
 
     public void onFileChangeEvent(Path file);
-    // public void onFileCreateEvent(Path file);
+    public void onFileCreateEvent(Path file);
 }
