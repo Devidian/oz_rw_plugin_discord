@@ -44,7 +44,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-    static final String pluginVersion = "0.10.2";
+    static final String pluginVersion = "0.10.3";
     static final String pluginName = "DiscordPlugin";
 
     static final String colorError = "[#FF0000]";
@@ -63,6 +63,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     static boolean postChat = false;
     static String webHookChatUrl = "";
     static String joinDiscord = "";
+    static boolean overrideAvatar = true;
 
     static boolean postSupport = false;
     static String webHookSupportUrl = "";
@@ -109,6 +110,10 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 
     public boolean getBotSecure() {
         return botSecure;
+    }
+
+    public boolean getOverrideAvatar() {
+        return overrideAvatar;
     }
 
     public String getColorSupport() {
@@ -258,7 +263,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                 color = colorLocalSelf;
             }
 
-            player.sendTextMessage(color + "[LOCAL] " + player.getName() + ": " + colorText + noColorText);
+            player.sendTextMessage(color + "[LOCAL] " + eventPlayer.getName() + ": " + colorText + noColorText);
         });
     }
 
@@ -360,8 +365,10 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 
             json.put("content", text);
             json.put("username", username);
-            String avatar_url = "https://api.adorable.io/avatars/128/" + username.replace(" ", "%20");
-            json.put("avatar_url", avatar_url);
+            if (overrideAvatar) {
+                String avatar_url = "https://api.adorable.io/avatars/128/" + username.replace(" ", "%20");
+                json.put("avatar_url", avatar_url);
+            }
 
             HttpClient httpClient = HttpClientBuilder.create().build();
             HttpPost post = new HttpPost(channel);
@@ -390,37 +397,39 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
         FileInputStream in;
         try {
             in = new FileInputStream(getPath() + "/settings.properties");
-            settings.load(new InputStreamReader(in,"UTF8"));
+            settings.load(new InputStreamReader(in, "UTF8"));
             in.close();
             // fill global values
             logLevel = Integer.parseInt(settings.getProperty("logLevel"));
             // log(settings.getProperty("webHookUrl"),0);
-            postChat = settings.getProperty("postChat").contentEquals("true");
+            postChat = settings.getProperty("postChat", "false").contentEquals("true");
             webHookChatUrl = settings.getProperty("webHookChatUrl");
             joinDiscord = settings.getProperty("joinDiscord");
+            overrideAvatar = settings.getProperty("overrideAvatar", "true").contentEquals("true");
 
-            postStatus = settings.getProperty("postStatus").contentEquals("true");
-            reportStatusEnabled = settings.getProperty("reportStatusEnabled").contentEquals("true");
-            reportStatusDisabled = settings.getProperty("reportStatusDisabled").contentEquals("true");
-            reportSettingsChanged = settings.getProperty("reportSettingsChanged").contentEquals("true");
-            reportJarChanged = settings.getProperty("reportJarChanged").contentEquals("true");
+            postStatus = settings.getProperty("postStatus", "false").contentEquals("true");
+            reportStatusEnabled = settings.getProperty("reportStatusEnabled", "true").contentEquals("true");
+            reportStatusDisabled = settings.getProperty("reportStatusDisabled", "true").contentEquals("true");
+            reportSettingsChanged = settings.getProperty("reportSettingsChanged", "true").contentEquals("true");
+            reportJarChanged = settings.getProperty("reportJarChanged", "true").contentEquals("true");
             webHookStatusUrl = settings.getProperty("webHookStatusUrl");
             statusUsername = settings.getProperty("statusUsername");
             statusEnabledMessage = settings.getProperty("statusEnabledMessage");
             statusDisabledMessage = settings.getProperty("statusDisabledMessage");
-            useServerName = settings.getProperty("useServerName").contentEquals("true");
+            useServerName = settings.getProperty("useServerName", "false").contentEquals("true");
 
-            postSupport = settings.getProperty("postSupport").contentEquals("true");
-            addTeleportCommand = settings.getProperty("addTeleportCommand").contentEquals("true");
+            postSupport = settings.getProperty("postSupport", "false").contentEquals("true");
+            addTeleportCommand = settings.getProperty("addTeleportCommand", "true").contentEquals("true");
             webHookSupportUrl = settings.getProperty("webHookSupportUrl");
 
-            botEnable = settings.getProperty("botEnable").contentEquals("true");
-            botSecure = settings.getProperty("botSecure").contentEquals("true");
+            botChatChannelName = settings.getProperty("botChatChannelName", "server-chat");
+            botEnable = settings.getProperty("botEnable", "false").contentEquals("true");
+            botSecure = settings.getProperty("botSecure", "true").contentEquals("true");
             botToken = settings.getProperty("botToken");
             botLang = settings.getProperty("botLang", "en");
 
             // motd settings
-            sendMOTD = settings.getProperty("sendMOTD").contentEquals("true");
+            sendMOTD = settings.getProperty("sendMOTD", "true").contentEquals("true");
             motd = settings.getProperty("motd");
 
             // restart settings

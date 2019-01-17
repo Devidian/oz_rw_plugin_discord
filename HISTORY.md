@@ -1,3 +1,8 @@
+### Version 0.10.3
+- Geändert: überschreiben der avatar_url ist jetzt  optional, kann in den settings geändert werden mit `overrideAvatar=true|false`
+- Behoben: der benutzername bei lokalem chat war immer der eigene
+- Hinzugefügt: Einstellung für den `botChatChannelName`
+
 ### Version 0.10.2
 - Neuer Discord Befehl: `!version` Zeigt die aktuelle Plugin Version an
 - Neuer Discord Befehl: `/kick` um Spieler zu kicken
