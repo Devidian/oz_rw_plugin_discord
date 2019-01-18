@@ -1,3 +1,6 @@
+### Version 0.11.0
+- Geändert: alle tools wurden entfernt und in ein eigenes jar/plugin gepackt, damit sie auch in anderen Plugins verwendet werden können ohne copy&paste
+
 ### Version 0.10.3
 - Geändert: überschreiben der avatar_url ist jetzt  optional, kann in den settings geändert werden mit `overrideAvatar=true|false`
 - Behoben: der benutzername bei lokalem chat war immer der eigene

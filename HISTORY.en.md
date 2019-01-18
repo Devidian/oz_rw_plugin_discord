@@ -1,3 +1,6 @@
+### Version 0.11.0
+- changed: removed all tools and moved them into a new plugin, so they can used in other plugins without copy&paste
+
 ### Version 0.10.3
 - changed: override of avatar_url is now  optional, can be changed in settings file with `overrideAvatar=true|false`
 - fixed: local chat always displayed your own name

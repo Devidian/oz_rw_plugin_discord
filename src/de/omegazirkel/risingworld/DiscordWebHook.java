@@ -44,7 +44,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-    static final String pluginVersion = "0.10.3";
+    static final String pluginVersion = "0.11.0";
     static final String pluginName = "DiscordPlugin";
 
     static final String colorError = "[#FF0000]";
