@@ -10,7 +10,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.listener.message.MessageCreateListener;
 
-import de.omegazirkel.tools.I18n;
+import de.omegazirkel.risingworld.tools.I18n;
 import net.risingworld.api.Server;
 import net.risingworld.api.objects.Player;
 

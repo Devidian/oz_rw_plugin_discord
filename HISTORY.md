@@ -1,3 +1,6 @@
+### Version 0.11.1
+- Behoben: das neue Tools Plugin wird nicht immer zuerst geladen, daher ist dies jetzt ein normales jar das unter lib beigefügt wird.
+
 ### Version 0.11.0
 - Geändert: alle tools wurden entfernt und in ein eigenes jar/plugin gepackt, damit sie auch in anderen Plugins verwendet werden können ohne copy&paste
 

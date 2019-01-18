@@ -5,8 +5,8 @@
  */
 package de.omegazirkel.risingworld;
 
-import de.omegazirkel.tools.FileChangeListener;
-import de.omegazirkel.tools.PluginChangeWatcher;
+import de.omegazirkel.risingworld.tools.FileChangeListener;
+import de.omegazirkel.risingworld.tools.PluginChangeWatcher;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -44,7 +44,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-    static final String pluginVersion = "0.11.0";
+    static final String pluginVersion = "0.11.1";
     static final String pluginName = "DiscordPlugin";
 
     static final String colorError = "[#FF0000]";
