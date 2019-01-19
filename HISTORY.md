@@ -1,3 +1,7 @@
+### Version 0.11.3
+- Behoben: GI prefix `#%` entfernt und leere Nachrichten ignorieren
+- Hinzugefügt: Weitere Textbausteine sind nun übersetzt
+
 ### Version 0.11.2
 - Hinzugefügt: in den settings können jetzt weitere Discord-Admins hinzugefügt werden, Beispiel: `botAdmins=Devidian#1334,SomeOneElse#1337`
 - Hinzugefügt: weitere übersetzungen von Textausgaben

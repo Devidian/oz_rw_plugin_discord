@@ -151,8 +151,9 @@ public class JavaCordBot implements Runnable {
 
                         channel.sendMessage(t.get("CMD_OUT_GROUP", lang).replace("PH_PLAYER", playerName)
                                 .replace("PH_GROUP", group));
-                        pluginInstance.getServer().broadcastTextMessage("[#FF8000]" + author.getDiscriminatedName()
-                                + " changed permission-group of " + playerName + " to " + group);
+                        String bcmsg = t.get("BC_GROUP", lang).replace("PH_DISCORDUSER", author.getDiscriminatedName())
+                                .replace("PH_PLAYER", playerName).replace("PH_GROUP", group);
+                        pluginInstance.getServer().broadcastTextMessage(bcmsg);
 
                     } else if (content.contentEquals("/restart")) {
                         int playersLeft = server.getPlayerCount();
@@ -186,9 +187,9 @@ public class JavaCordBot implements Runnable {
                 } else if (content.contentEquals("!online")) {
                     int playersOnline = server.getPlayerCount();
                     if (playersOnline == 0) {
-                        channel.sendMessage("No Players online");
+                        channel.sendMessage(t.get("CMD_OUT_ONLINE_NOBODY", lang));
                     } else {
-                        List<String> list = Arrays.asList("Currently online:\n");
+                        List<String> list = Arrays.asList(t.get("CMD_OUT_ONLINE_LIST", lang) + "\n");
                         StringBuilder sb = new StringBuilder();
                         list.forEach(sb::append);
                         server.getAllPlayers().forEach((Player p) -> {
