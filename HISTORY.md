@@ -1,3 +1,7 @@
+### Version 0.11.2
+- Hinzugefügt: in den settings können jetzt weitere Discord-Admins hinzugefügt werden, Beispiel: `botAdmins=Devidian#1334,SomeOneElse#1337`
+- Hinzugefügt: weitere übersetzungen von Textausgaben
+
 ### Version 0.11.1
 - Behoben: das neue Tools Plugin wird nicht immer zuerst geladen, daher ist dies jetzt ein normales jar das unter lib beigefügt wird.
 

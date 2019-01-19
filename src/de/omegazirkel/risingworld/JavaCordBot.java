@@ -54,20 +54,22 @@ public class JavaCordBot implements Runnable {
             }
             boolean isSecureCommand = content.startsWith("/");
             boolean isCommand = content.startsWith("!");
-            boolean canExecuteSecureCommands = !pluginInstance.getBotSecure() || author.isBotOwner();
+            boolean canExecuteSecureCommands = !pluginInstance.getBotSecure() || author.isBotOwner()
+                    || pluginInstance.getBotAdmins().contains(author.getDiscriminatedName());
 
             if (isSecureCommand) {
                 if (canExecuteSecureCommands) {
                     if (content.startsWith("/support")) {
                         String[] parts = content.split(" ", 3);
                         if (parts.length < 3) {
-                            channel.sendMessage("Wrong number of Arguments, use `/support PLAYERNAME TEXT...`");
+                            channel.sendMessage(t.get("CMD_ERR_SUPPORT_ARGUMENTS", lang));
                             return;
                         }
                         String playerName = parts[1];
                         Player player = server.getPlayer(playerName);
                         if (player == null) {
-                            channel.sendMessage("Player with name " + playerName + " not online.");
+                            channel.sendMessage(
+                                    t.get("CMD_ERR_SUPPORT_ARGUMENTS", lang).replace("PH_PLAYER", playerName));
                             return;
                         }
 
@@ -76,7 +78,7 @@ public class JavaCordBot implements Runnable {
                     } else if (content.startsWith("/bc")) {
                         String[] parts = content.split(" ", 3);
                         if (parts.length < 3) {
-                            channel.sendMessage("Wrong number of Arguments, use `/bc TYPE TEXT...`");
+                            channel.sendMessage(t.get("CMD_ERR_BC_ARGUMENTS", lang));
                             return;
                         }
                         String type = parts[1];
@@ -86,7 +88,7 @@ public class JavaCordBot implements Runnable {
                     } else if (content.startsWith("/yell")) {
                         String[] parts = content.split(" ", 2);
                         if (parts.length < 2) {
-                            channel.sendMessage("Wrong number of Arguments, use `/yell TEXT...`");
+                            channel.sendMessage(t.get("CMD_ERR_YELL_ARGUMENTS", lang));
                             return;
                         }
 
@@ -94,70 +96,79 @@ public class JavaCordBot implements Runnable {
                     } else if (content.startsWith("/kick")) {
                         String[] parts = content.split(" ", 3);
                         if (parts.length < 2) {
-                            channel.sendMessage("Wrong number of Arguments, use `/kick PLAYERNAME [reason?]`");
+                            channel.sendMessage(t.get("CMD_ERR_KICK_ARGUMENTS", lang));
                             return;
                         }
                         String playerName = parts[1];
                         String reason = parts.length > 2 ? parts[2] : null;
                         Player player = server.getPlayer(playerName);
                         if (player == null) {
-                            channel.sendMessage("Player with name " + playerName + " not online.");
+                            channel.sendMessage(
+                                    t.get("CMD_ERR_SUPPORT_ARGUMENTS", lang).replace("PH_PLAYER", playerName));
                             return;
                         }
                         player.kick(reason);
                         channel.sendMessage("Player " + playerName + " kicked!");
-                        pluginInstance.getServer().broadcastTextMessage("[#FF8000]" + author.getDiscriminatedName()
-                                + " kicked player " + playerName + " reason: " + reason);
+                        pluginInstance.getServer()
+                                .broadcastTextMessage(t.get("BC_KICKED", lang).replace("PH_PLAYER", playerName)
+                                        .replace("PH_DISCORDUSER", author.getDiscriminatedName())
+                                        .replace("PH_REASON", reason));
                     } else if (content.startsWith("/ban")) {
                         String[] parts = content.split(" ", 3);
                         if (parts.length < 2) {
-                            channel.sendMessage("Wrong number of Arguments, use `/ban PLAYERNAME [reason?]`");
+                            channel.sendMessage(t.get("CMD_ERR_BAN_ARGUMENTS", lang));
                             return;
                         }
                         String playerName = parts[1];
                         String reason = parts.length > 2 ? parts[2] : null;
                         Player player = server.getPlayer(playerName);
                         if (player == null) {
-                            channel.sendMessage("Player with name " + playerName + " not online.");
+                            channel.sendMessage(
+                                    t.get("CMD_ERR_SUPPORT_ARGUMENTS", lang).replace("PH_PLAYER", playerName));
                             return;
                         }
                         player.ban(reason);
                         channel.sendMessage("Player " + playerName + " banned!");
-                        pluginInstance.getServer().broadcastTextMessage("[#FF8000]" + author.getDiscriminatedName()
-                                + " banned player " + playerName + " reason: " + reason);
+                        pluginInstance.getServer()
+                                .broadcastTextMessage(t.get("BC_BANNED", lang).replace("PH_PLAYER", playerName)
+                                        .replace("PH_DISCORDUSER", author.getDiscriminatedName())
+                                        .replace("PH_REASON", reason));
                     } else if (content.startsWith("/group")) {
                         String[] parts = content.split(" ", 3);
                         if (parts.length < 3) {
-                            channel.sendMessage("Wrong number of Arguments, use `/group PLAYERNAME GROUP`");
+                            channel.sendMessage(t.get("CMD_ERR_GROUP_ARGUMENTS", lang));
                             return;
                         }
                         String playerName = parts[1];
                         String group = parts[2];
                         Player player = server.getPlayer(playerName);
                         if (player == null) {
-                            channel.sendMessage("Player with name " + playerName + " not online.");
+                            channel.sendMessage(
+                                    t.get("CMD_ERR_SUPPORT_ARGUMENTS", lang).replace("PH_PLAYER", playerName));
                             return;
                         }
                         player.setPermissionGroup(group);
 
-                        channel.sendMessage("Player " + playerName + " Permission group is set to " + group);
+                        channel.sendMessage(t.get("CMD_OUT_GROUP", lang).replace("PH_PLAYER", playerName)
+                                .replace("PH_GROUP", group));
                         pluginInstance.getServer().broadcastTextMessage("[#FF8000]" + author.getDiscriminatedName()
                                 + " changed permission-group of " + playerName + " to " + group);
 
                     } else if (content.contentEquals("/restart")) {
                         int playersLeft = server.getPlayerCount();
                         if (playersLeft == 0) {
-                            channel.sendMessage("No Player online, executing shutdown");
+                            channel.sendMessage(t.get("CMD_OUT_RESTART_NOW", lang));
                             server.shutdown();
                         } else {
-                            channel.sendMessage(playersLeft + " Player(s) online, restart flag set");
-                            pluginInstance.getServer().broadcastTextMessage("[#FF8000]" + author.getDiscriminatedName()
-                                    + " set restart flag. Server will shutdown after last player has left the server!");
+                            channel.sendMessage(
+                                    t.get("CMD_OUT_RESTART_DELAY", lang).replace("PH_PLAYERS", playersLeft + ""));
+                            pluginInstance.getServer().broadcastTextMessage(
+                                    t.get("BC_RESTART", lang).replace("PH_DISCORDUSER", author.getDiscriminatedName()));
                             pluginInstance.setFlagRestart(true);
                         }
                     }
                 } else {
-                    channel.sendMessage("You are not allowed to execute secure commands. Type `!help` for more info");
+                    channel.sendMessage(t.get("CMD_ERR_SECURE", lang));
                 }
             } else if (isCommand) {
                 if (content.contentEquals("!help")) {

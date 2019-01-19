@@ -3,19 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.omegazirkel.risingworld</groupId>
     <artifactId>DiscordPlugin</artifactId>
-    <version>0.11.1-SNAPSHOT</version>
+    <version>0.11.2-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.javacord</groupId>
-                <artifactId>javacord</artifactId>
-                <version>3.0.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <dependencyManagement></dependencyManagement>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.javacord/javacord-api -->
         <dependency>

@@ -1,3 +1,7 @@
+### Version 0.11.2
+- added: in the settings you can now add other Discord User that are allowed to execute secure commands, example: `botAdmins=Devidian#1334,SomeOneElse#1337`
+- added: more text-output translations 
+
 ### Version 0.11.1
 - fixed: as the new tools plugin is not loaded in first place it is now converted to a normal jar that comes within the lib folder.
 

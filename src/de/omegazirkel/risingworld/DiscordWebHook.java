@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.util.Properties;
@@ -32,7 +31,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -44,7 +42,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-    static final String pluginVersion = "0.11.1";
+    static final String pluginVersion = "0.11.2";
     static final String pluginName = "DiscordPlugin";
 
     static final String colorError = "[#FF0000]";
@@ -86,6 +84,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     static boolean botEnable = false;
     static boolean botSecure = true;
     static String botToken = "";
+    static String botAdmins = "";
     static String botLang = "en";
     static String botChatChannelName = "server-chat";
 
@@ -102,6 +101,10 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     // getter
     public String getBotToken() {
         return botToken;
+    }
+
+    public String getBotAdmins() {
+        return botAdmins;
     }
 
     public String getBotLanguage() {
@@ -425,8 +428,9 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
             botChatChannelName = settings.getProperty("botChatChannelName", "server-chat");
             botEnable = settings.getProperty("botEnable", "false").contentEquals("true");
             botSecure = settings.getProperty("botSecure", "true").contentEquals("true");
-            botToken = settings.getProperty("botToken");
+            botToken = settings.getProperty("botToken","");
             botLang = settings.getProperty("botLang", "en");
+            botAdmins = settings.getProperty("botAdmins", "");
 
             // motd settings
             sendMOTD = settings.getProperty("sendMOTD", "true").contentEquals("true");
