@@ -1,3 +1,9 @@
+## [Unreleased]
+
+## [0.11.4] - 2019-01-26
+### Changed
+- tools.jar auf 0.2.0 aktualisiert
+
 ### Version 0.11.3
 - Behoben: GI prefix `#%` entfernt und leere Nachrichten ignorieren
 - Hinzugefügt: Weitere Textbausteine sind nun übersetzt

@@ -1,3 +1,9 @@
+## [Unreleased]
+
+## [0.11.4] - 2019-01-26
+### Changed
+- tools.jar updated to 0.2.0
+
 ### Version 0.11.3
 - fixed: remove #% prefix, ignore empty messages
 - added: more text-output translations 
