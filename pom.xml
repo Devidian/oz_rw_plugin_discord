@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.omegazirkel.risingworld</groupId>
     <artifactId>DiscordPlugin</artifactId>
-    <version>0.11.4</version>
+    <version>0.11.5</version>
     <packaging>jar</packaging>
     <dependencyManagement></dependencyManagement>
     <dependencies>
@@ -78,6 +78,17 @@
             </resource>
         </resources>
         <plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Class-Path>../shared/lib/tools.jar</Class-Path>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>

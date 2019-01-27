@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.11.5] - 2019-01-27
+- the plugin-shared lib `tools.jar` must now be placed into `/plugins/shared/lib/tools.jar`
+
 ## [0.11.4] - 2019-01-26
 ### Changed
 - tools.jar updated to 0.2.0

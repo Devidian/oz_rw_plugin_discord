@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.11.5] - 2019-01-27
+- Die plugin-übergreifende `tools.jar` muss nun unter `/plugins/shared/lib/tools.jar` zur Verfügung stehen
+
 ## [0.11.4] - 2019-01-26
 ### Changed
 - tools.jar auf 0.2.0 aktualisiert
