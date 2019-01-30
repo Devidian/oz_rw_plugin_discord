@@ -1,6 +1,22 @@
 ## [Unreleased]
 
+## [0.12.0] - 2019-01-30
+### Added
+- Befehle die mit `/dp` beginnen hinzugefügt
+- neuer Befehl `/dp info` zeigt die Beschreibung des Plugins
+- neuer Befehl `/dp help` zeigt alle möglichen Befehle des Plugins
+- neuer Befehl `/dp status` zeigt den aktuellen Status des Plugins wie Version und Sprache
+
+### Changed
+- die log methode in `DiscordWebHook` wurde durch den Logger aus `tools` ersetzt
+- `JavaCordBot` hat nun seinen eigenen Logger aus `tools`
+- broadcast Nachrichten werden nun anhand der Spieler-Systemsprache übersetzt
+- Befehls-Nachrichten werden nun auch anhand der Spieler-Systemsprache übersetzt
+- `/ozrestart` ist jetzt deprecated und wird bald entfernt, verwende `/dp restart` statt dessen
+- Alle Nachrichten haben nun ein Plugin-prefix
+
 ## [0.11.5] - 2019-01-27
+### Changed
 - Die plugin-übergreifende `tools.jar` muss nun unter `/plugins/shared/lib/tools.jar` zur Verfügung stehen
 
 ## [0.11.4] - 2019-01-26
