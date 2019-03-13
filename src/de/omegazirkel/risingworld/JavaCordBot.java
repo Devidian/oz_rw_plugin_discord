@@ -10,6 +10,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.listener.message.MessageCreateListener;
 
+import de.omegazirkel.risingworld.tools.Colors;
 import de.omegazirkel.risingworld.tools.I18n;
 import net.risingworld.api.Server;
 import net.risingworld.api.objects.Player;
@@ -22,6 +23,7 @@ public class JavaCordBot implements Runnable {
 
     static final de.omegazirkel.risingworld.tools.Logger log = new de.omegazirkel.risingworld.tools.Logger(
             "[OZ.DP] [JavaCordBot]");
+    static final Colors c = Colors.getInstance();
     private static I18n t = null;
 
     private MessageCreateListener messageCreateListener = null;
@@ -114,8 +116,8 @@ public class JavaCordBot implements Runnable {
                         channel.sendMessage("Player " + playerName + " kicked!");
                         pluginInstance.getServer().getAllPlayers().forEach((p) -> {
                             String l = p.getSystemLanguage();
-                            p.sendTextMessage(DiscordWebHook.colorWarning + DiscordWebHook.pluginName + ":>"
-                                    + DiscordWebHook.colorText
+                            p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>"
+                                    + c.text
                                     + t.get("BC_KICKED", l).replace("PH_PLAYER", playerName)
                                             .replace("PH_DISCORDUSER", author.getDiscriminatedName())
                                             .replace("PH_REASON", reason));
@@ -138,8 +140,8 @@ public class JavaCordBot implements Runnable {
                         channel.sendMessage("Player " + playerName + " banned!");
                         pluginInstance.getServer().getAllPlayers().forEach((p) -> {
                             String l = p.getSystemLanguage();
-                            p.sendTextMessage(DiscordWebHook.colorWarning + DiscordWebHook.pluginName + ":>"
-                                    + DiscordWebHook.colorText
+                            p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>"
+                                    + c.text
                                     + t.get("BC_BANNED", l).replace("PH_PLAYER", playerName)
                                             .replace("PH_DISCORDUSER", author.getDiscriminatedName())
                                             .replace("PH_REASON", reason));
@@ -164,8 +166,8 @@ public class JavaCordBot implements Runnable {
                                 .replace("PH_GROUP", group));
                         pluginInstance.getServer().getAllPlayers().forEach((p) -> {
                             String l = p.getSystemLanguage();
-                            p.sendTextMessage(DiscordWebHook.colorWarning + DiscordWebHook.pluginName + ":>"
-                                    + DiscordWebHook.colorText
+                            p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>"
+                                    + c.text
                                     + t.get("BC_GROUP", l).replace("PH_DISCORDUSER", author.getDiscriminatedName())
                                             .replace("PH_PLAYER", playerName).replace("PH_GROUP", group));
                         });
@@ -180,8 +182,8 @@ public class JavaCordBot implements Runnable {
                                     t.get("CMD_OUT_RESTART_DELAY", lang).replace("PH_PLAYERS", playersLeft + ""));
                             pluginInstance.getServer().getAllPlayers().forEach((p) -> {
                                 String l = p.getSystemLanguage();
-                                p.sendTextMessage(DiscordWebHook.colorWarning + DiscordWebHook.pluginName + ":>"
-                                        + DiscordWebHook.colorText + t.get("BC_GROUP", l).replace("PH_DISCORDUSER",
+                                p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>"
+                                        + c.text + t.get("BC_GROUP", l).replace("PH_DISCORDUSER",
                                                 author.getDiscriminatedName()));
                             });
                             pluginInstance.setFlagRestart(true);

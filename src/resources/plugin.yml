@@ -1,6 +1,6 @@
 name: "Omega Zirkel - Discord Plugin"
 main: de.omegazirkel.risingworld.DiscordWebHook
-version: 0.12.0
+version: 0.13.0-SNAPSHOT
 author: "Maik 'Devidian' Laschober"
 team: "Omega Zirkel"
 description: "This Plugin can be used to display ingame chat in a Discord channel"

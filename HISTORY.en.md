@@ -1,4 +1,10 @@
 ## [Unreleased]
+### Changed
+- now using tools.jar in version 0.4.1
+- text colors were removed from `DiscordWebHook` class, now Colors from tools will be used
+- motd removed, its now called `plugin welcome message` and can only be turned on/off in the settings. The text definition has moved to the language files so every user can read the plugin welcome in his language (so far translated)
+- Plugin enabled message now triggert in onEnabled
+- initSettings now sends settings loaded message to serverlog
 
 ## [0.12.0] - 2019-01-30
 ### Added
@@ -25,11 +31,11 @@
 
 ### Version 0.11.3
 - fixed: remove #% prefix, ignore empty messages
-- added: more text-output translations 
+- added: more text-output translations
 
 ### Version 0.11.2
 - added: in the settings you can now add other Discord User that are allowed to execute secure commands, example: `botAdmins=Devidian#1334,SomeOneElse#1337`
-- added: more text-output translations 
+- added: more text-output translations
 
 ### Version 0.11.1
 - fixed: as the new tools plugin is not loaded in first place it is now converted to a normal jar that comes within the lib folder.

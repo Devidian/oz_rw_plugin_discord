@@ -5,6 +5,7 @@
  */
 package de.omegazirkel.risingworld;
 
+import de.omegazirkel.risingworld.tools.Colors;
 import de.omegazirkel.risingworld.tools.FileChangeListener;
 import de.omegazirkel.risingworld.tools.I18n;
 import de.omegazirkel.risingworld.tools.PluginChangeWatcher;
@@ -43,17 +44,12 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-    static final String pluginVersion = "0.12.0";
+    static final String pluginVersion = "0.13.0-SNAPSHOT";
     static final String pluginName = "DiscordPlugin";
 
     static final de.omegazirkel.risingworld.tools.Logger log = new de.omegazirkel.risingworld.tools.Logger("[OZ.DP]");
+	static final Colors c = Colors.getInstance();
     private static I18n t = null;
-
-    static final String colorError = "[#FF0000]";
-    static final String colorWarning = "[#808000]";
-    static final String colorOkay = "[#00FF00]";
-    static final String colorText = "[#EEEEEE]";
-    static final String colorCommand = "[#997d4a]";
 
     static final String colorSupport = "[#782d8e]";
     static final String colorLocalSelf = "[#ddffdd]";
@@ -82,8 +78,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     static String statusDisabledMessage = "My Server is shutting down";
     static String webHookStatusUrl = "";
 
-    static boolean sendMOTD = false;
-    static String motd = "Welcome this server uses Omega-Zirkel Discord Plugin";
+    static boolean sendPluginWelcome = false;
 
     static boolean botEnable = false;
     static boolean botSecure = true;
@@ -128,7 +123,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     }
 
     public String getColorText() {
-        return colorText;
+        return c.text;
     }
 
     public void setFlagRestart(boolean value) {
@@ -177,6 +172,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
         }
         DiscordBot = new JavaCordBot(this);
         DiscordBot.run();
+		log.out(pluginName + " Plugin is enabled", 10);
     }
 
     @EventMethod
@@ -208,33 +204,33 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                     flagRestart = true;
                 } else {
                     player.sendTextMessage(
-                            colorError + pluginName + ":>" + colorText + t.get("CMD_RESTART_NOTALLOWED", lang));
+                            c.error + pluginName + ":>" + c.text + t.get("CMD_RESTART_NOTALLOWED", lang));
                 }
                 break;
             case "info":
                 String infoMessage = t.get("CMD_INFO", lang)
-                        .replace("PH_CMD_SUPPORT", colorCommand + "/support TEXT" + colorText)
-                        .replace("PH_CMD_HELP", colorCommand + "/dp help" + colorText);
-                player.sendTextMessage(colorOkay + pluginName + ":> " + colorText + infoMessage);
+                        .replace("PH_CMD_SUPPORT", c.command + "/support TEXT" + c.text)
+                        .replace("PH_CMD_HELP", c.command + "/dp help" + c.text);
+                player.sendTextMessage(c.okay + pluginName + ":> " + c.text + infoMessage);
                 break;
             case "help":
                 String helpMessage = t.get("CMD_HELP", lang)
-                        .replace("PH_CMD_SUPPORT", colorCommand + "/support TEXT" + colorText)
-                        .replace("PH_CMD_HELP", colorCommand + "/dp help" + colorText)
-                        .replace("PH_CMD_RESTART", colorCommand + "/dp restart" + colorText)
-                        .replace("PH_CMD_INFO", colorCommand + "/dp info" + colorText)
-                        .replace("PH_CMD_STATUS", colorCommand + "/dp status" + colorText)
-                        .replace("PH_CMD_JOIN", colorCommand + "/joinDiscord" + colorText);
-                player.sendTextMessage(colorOkay + pluginName + ":> " + colorText + helpMessage);
+                        .replace("PH_CMD_SUPPORT", c.command + "/support TEXT" + c.text)
+                        .replace("PH_CMD_HELP", c.command + "/dp help" + c.text)
+                        .replace("PH_CMD_RESTART", c.command + "/dp restart" + c.text)
+                        .replace("PH_CMD_INFO", c.command + "/dp info" + c.text)
+                        .replace("PH_CMD_STATUS", c.command + "/dp status" + c.text)
+                        .replace("PH_CMD_JOIN", c.command + "/joinDiscord" + c.text);
+                player.sendTextMessage(c.okay + pluginName + ":> " + c.text + helpMessage);
                 break;
             case "status":
                 String statusMessage = t.get("CMD_STATUS", lang)
-                        .replace("PH_VERSION", colorOkay + pluginVersion + colorText)
+                        .replace("PH_VERSION", c.okay + pluginVersion + c.text)
                         .replace("PH_LANGUAGE",
-                                colorLocalSelf + player.getLanguage() + " / " + player.getSystemLanguage() + colorText)
-                        .replace("PH_USEDLANG", colorLocalOther + t.getLanguageUsed(lang) + colorText)
-                        .replace("PH_LANG_AVAILABLE", colorOkay + t.getLanguageAvailable() + colorText);
-                player.sendTextMessage(colorOkay + pluginName + ":> " + colorText + statusMessage);
+                                colorLocalSelf + player.getLanguage() + " / " + player.getSystemLanguage() + c.text)
+                        .replace("PH_USEDLANG", colorLocalOther + t.getLanguageUsed(lang) + c.text)
+                        .replace("PH_LANG_AVAILABLE", c.okay + t.getLanguageAvailable() + c.text);
+                player.sendTextMessage(c.okay + pluginName + ":> " + c.text + statusMessage);
                 break;
             default:
                 break;
@@ -253,20 +249,20 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                 }
                 supportMessage += "```";
                 this.sendDiscordMessage("SupportTicket", supportMessage, webHookSupportUrl);
-                player.sendTextMessage(colorOkay + pluginName + ":>" + colorText + t.get("SUPPORT_SUCCESS", lang));
+                player.sendTextMessage(c.okay + pluginName + ":>" + c.text + t.get("SUPPORT_SUCCESS", lang));
             } else {
                 player.sendTextMessage(
-                        colorError + pluginName + ":>" + colorText + t.get("SUPPORT_NOTAVAILABLE", lang));
+                        c.error + pluginName + ":>" + c.text + t.get("SUPPORT_NOTAVAILABLE", lang));
             }
         } else if (command.equals("/joinDiscord")) {
             if (joinDiscord.isEmpty()) {
-                player.sendTextMessage(colorError + pluginName + ":>" + colorText + t.get("CMD_JOINDISCORD_NA", lang));
+                player.sendTextMessage(c.error + pluginName + ":>" + c.text + t.get("CMD_JOINDISCORD_NA", lang));
             } else {
                 player.connectToDiscord("https://discord.gg/" + joinDiscord);
             }
         } else if (command.equals("/ozrestart")) {
-            player.sendTextMessage(colorError + pluginName + ":>" + colorText
-                    + t.get("CMD_ERR_DEPRECATED", lang).replace("PH_NEWCMD", colorCommand + "/dp restart" + colorText));
+            player.sendTextMessage(c.error + pluginName + ":>" + c.text
+                    + t.get("CMD_ERR_DEPRECATED", lang).replace("PH_NEWCMD", c.command + "/dp restart" + c.text));
         }
 
     }
@@ -313,7 +309,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
                 color = colorLocalSelf;
             }
 
-            player.sendTextMessage(color + "[LOCAL] " + eventPlayer.getName() + ": " + colorText + noColorText);
+            player.sendTextMessage(color + "[LOCAL] " + eventPlayer.getName() + ": " + c.text + noColorText);
         });
     }
 
@@ -323,9 +319,10 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
      */
     @EventMethod
     public void onPlayerSpawn(PlayerSpawnEvent event) {
-        if (sendMOTD) {
+        if (sendPluginWelcome) {
             Player player = event.getPlayer();
-            player.sendTextMessage(motd);
+			String lang = player.getSystemLanguage();
+			player.sendTextMessage(t.get("MSG_PLUGIN_WELCOME", lang));
         }
     }
 
@@ -480,20 +477,18 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
             botAdmins = settings.getProperty("botAdmins", "");
 
             // motd settings
-            sendMOTD = settings.getProperty("sendMOTD", "true").contentEquals("true");
-            motd = settings.getProperty("motd");
+            sendPluginWelcome = settings.getProperty("sendPluginWelcome", "true").contentEquals("true");
 
             // restart settings
             allowRestart = settings.getProperty("allowRestart").contentEquals("true");
             restartOnUpdate = settings.getProperty("restartOnUpdate").contentEquals("true");
             restartMinimumTime = Integer.parseInt(settings.getProperty("restartMinimumTime"));
-            log.out("OmegaZirkel Discord Plugin is enabled", 10);
+            log.out(pluginName + " Plugin settings loaded", 10);
 
             log.out("Will send chat to Discord: " + String.valueOf(postChat), 10);
             log.out("Will send status to Discord: " + String.valueOf(postStatus), 10);
             log.out("Will send support tickets to Discord: " + String.valueOf(postSupport), 10);
-            log.out("Sending motd on login is: " + String.valueOf(sendMOTD), 10);
-            log.out("motd is: " + String.valueOf(motd), 10);
+            log.out("Sending welcome message on login is: " + String.valueOf(sendPluginWelcome), 10);
 
         } catch (IOException ex) {
             log.out("IOException on initSettings: " + ex.getMessage(), 100);
@@ -506,33 +501,33 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
     }
 
     /**
-     * 
+     *
      * @param i18nIndex
      * @param playerName
      */
     private void broadcastMessage(String i18nIndex, String playerName) {
         getServer().getAllPlayers().forEach((player) -> {
             String lang = player.getSystemLanguage();
-            player.sendTextMessage(colorWarning + pluginName + ":> " + colorText
+            player.sendTextMessage(c.warning + pluginName + ":> " + c.text
                     + t.get(i18nIndex, lang).replace("PH_PLAYER", playerName));
         });
     }
 
     /**
-     * 
+     *
      * @param i18nIndex
      * @param playerCount
      */
     private void broadcastMessage(String i18nIndex, int playerCount) {
         getServer().getAllPlayers().forEach((player) -> {
             String lang = player.getSystemLanguage();
-            player.sendTextMessage(colorWarning + pluginName + ":> " + colorText
+            player.sendTextMessage(c.warning + pluginName + ":> " + c.text
                     + t.get(i18nIndex, lang).replace("PH_PLAYERS", playerCount + ""));
         });
     }
 
     /**
-     * 
+     *
      * @param i18nIndex
      */
     private void broadcastMessage(String i18nIndex) {
