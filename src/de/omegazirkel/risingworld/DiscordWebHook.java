@@ -52,7 +52,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "0.13.0";
+	static final String pluginVersion = "0.13.1";
 	static final String pluginName = "DiscordPlugin";
 	static final String pluginCMD = "dp";
 
@@ -271,7 +271,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 					try {
 						ImageIO.write(bimg, "jpg", os);
 						// Base64.getEncoder().encodeToString(os.toByteArray());
-						this.sendDiscordMessage(player.getName(), msgToSend, webHookChatUrl, os.toByteArray());
+						this.sendDiscordMessage(player.getName(), msgToSend, webHookSupportUrl, os.toByteArray());
 						player.sendTextMessage(c.okay + pluginName + ":>" + c.text + t.get("SUPPORT_SUCCESS", lang));
 					} catch (Exception e) {
 						// throw new UncheckedIOException(ioe);
@@ -451,7 +451,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 * @param channel
 	 * @param image
 	 */
-	private void sendDiscordMessage(String username, String text, String channel, byte[] image) {
+	private void 	sendDiscordMessage(String username, String text, String channel, byte[] image) {
 		try {
 			// Username Validation
 			username = username.replace("@", "").replace("@", "").replace(":", "").replace("`", ""); // remove invalid
