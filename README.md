@@ -8,6 +8,8 @@
 - Server erkennt updates in settings.properties und läd diese neu. Kann optional in den Discord status Kanal gepostet werden
 - Server erkennt Änderungen am JAR file und reagiert (wenn aktiviert) mit einem neustart des servers (oder aber setzt das restart flag falls noch spieler online sind) Wird im Spiel und optional in Discord reported
 - Spieler können mit /joinDiscord dem Discord des Servers beitreten sofern es konfiguriert wurde
+- Support Nachrichten haben automatisch einen screenshot beigefügt
+- Mit `+screen` im chat kann ein screenshot in den discord kanal hochgeladen werden
 
 # Geplante Features:
 Aktuell keine weiteren
@@ -16,7 +18,7 @@ Aktuell keine weiteren
 |Command|Description|
 |---|---|
 |/support [text]|sends [text] as support message to Discord|
-|/ozrestart|set restart flag to shutdown server after last player has left|
+|/dp restart|set restart flag to shutdown server after last player has left|
 |/joinDiscord|join the servers Discord server| 
 
 # Befehle discord:

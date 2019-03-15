@@ -1,10 +1,17 @@
 ## [Unreleased]
+
+
+## [0.13.0] - 2019-03-15
 ### Changed
 - now using tools.jar in version 0.4.1
 - text colors were removed from `DiscordWebHook` class, now Colors from tools will be used
 - motd removed, its now called `plugin welcome message` and can only be turned on/off in the settings. The text definition has moved to the language files so every user can read the plugin welcome in his language (so far translated)
 - Plugin enabled message now triggert in onEnabled
 - initSettings now sends settings loaded message to serverlog
+### Added
+- if you write `+sceen` into a chat message, a screenshot will be uploaded that can be viewed in discord (not ingame)
+- in the `settings.properties` you can set screenshots on/off and the maximum screen resolution (width of the image)
+- support messages will always have a screenshot attached (may change in future)
 
 ## [0.12.0] - 2019-01-30
 ### Added

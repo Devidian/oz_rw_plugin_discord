@@ -8,6 +8,8 @@
 - plugin detects changes to settings.properties and reloads them. A message can be sent to discord if you like.
 - plugin detects changes to jar files and sets restart flag if you like. Can also report this to discord and ingame chat
 - players can type /joinDiscord to join your discord if you configure this
+- support messages now have a screenshot attached
+- normal chat messages wich contain `+screen` have a screenshot uploaded to discord
 
 # Planned features:
 currently none
@@ -16,7 +18,7 @@ currently none
 |Command|Description|
 |---|---|
 |/support [text]|sends [text] as support message to Discord|
-|/ozrestart|set restart flag to shutdown server after last player has left|
+|/dp restart|set restart flag to shutdown server after last player has left|
 |/joinDiscord|join the servers Discord server| 
 
 
