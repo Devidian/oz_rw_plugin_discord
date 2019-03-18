@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.13.3] - 2019-03-18
+## Added
+- einige Listener zum JavaCordBot hinzugefügt um Verbindungsabbrüche zu loggen.
+- neue Einstellung in den `settings.properties` => `supportScreenshot` um automatischen screenshot bei support nachrichten einzustellen
+## Fixed
+- Fehler der den Absturz vor 0.13.2 verursacht hatte wurde behoben
+
 ## [0.13.2] - 2019-03-18
 ## Fixed
 - Der Fehler der einen Absturz bei einem Plugin Update verursachte, sollte nun abgefangen werden.

@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.13.3] - 2019-03-18
+## Added
+- some listener added to JavaCordBot to log lost connections.
+- new property in `settings.properties` => `supportScreenshot` to enable or disable auto-screenshot in support messages
+## Fixed
+- the exception that caused crash before 0.13.2 is now fixed
+
 ## [0.13.2] - 2019-03-18
 ## Fixed
 - An exception that caused a crash on update should now be catched

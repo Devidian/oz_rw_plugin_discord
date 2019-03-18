@@ -52,7 +52,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "0.13.2";
+	static final String pluginVersion = "0.13.3";
 	static final String pluginName = "DiscordPlugin";
 	static final String pluginCMD = "dp";
 
@@ -73,6 +73,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	static boolean overrideAvatar = true;
 
 	static boolean postSupport = false;
+	static boolean supportScreenshot = true;
+
 	static String webHookSupportUrl = "";
 	static boolean addTeleportCommand = true;
 
@@ -259,28 +261,32 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 					supportMessage += "\nTeleport command:> goto " + pos.x + " " + pos.y + " " + pos.z;
 				}
 				supportMessage += "```";
-				int playerResolutionX = player.getScreenResolutionX();
-				float sizeFactor = 1.0f;
-				if (playerResolutionX > maxScreenWidth) {
-					sizeFactor = (maxScreenWidth * 1f / playerResolutionX * 1f);
-				}
-				log.out("Taking screenshot with factor " + sizeFactor, 0);
-				final String msgToSend = supportMessage;
-				player.createScreenshot(sizeFactor, (BufferedImage bimg) -> {
-					final ByteArrayOutputStream os = new ByteArrayOutputStream();
-					try {
-						ImageIO.write(bimg, "jpg", os);
-						// Base64.getEncoder().encodeToString(os.toByteArray());
-						this.sendDiscordMessage(player.getName(), msgToSend, webHookSupportUrl, os.toByteArray());
-						player.sendTextMessage(c.okay + pluginName + ":>" + c.text + t.get("SUPPORT_SUCCESS", lang));
-					} catch (Exception e) {
-						// throw new UncheckedIOException(ioe);
-						log.out(e.toString());
+				if (supportScreenshot || message.contains("+screen")) {
+
+					int playerResolutionX = player.getScreenResolutionX();
+					float sizeFactor = 1.0f;
+					if (playerResolutionX > maxScreenWidth) {
+						sizeFactor = (maxScreenWidth * 1f / playerResolutionX * 1f);
 					}
-				});
-				// this.sendDiscordMessage("SupportTicket", supportMessage, webHookSupportUrl);
-				// player.sendTextMessage(c.okay + pluginName + ":>" + c.text +
-				// t.get("SUPPORT_SUCCESS", lang));
+					log.out("Taking screenshot with factor " + sizeFactor, 0);
+					final String msgToSend = supportMessage;
+					player.createScreenshot(sizeFactor, (BufferedImage bimg) -> {
+						final ByteArrayOutputStream os = new ByteArrayOutputStream();
+						try {
+							ImageIO.write(bimg, "jpg", os);
+							// Base64.getEncoder().encodeToString(os.toByteArray());
+							this.sendDiscordMessage("SupportTicket", msgToSend, webHookSupportUrl, os.toByteArray());
+							player.sendTextMessage(
+									c.okay + pluginName + ":>" + c.text + t.get("SUPPORT_SUCCESS", lang));
+						} catch (Exception e) {
+							// throw new UncheckedIOException(ioe);
+							log.out(e.toString());
+						}
+					});
+				} else {
+					this.sendDiscordMessage("SupportTicket", supportMessage, webHookSupportUrl);
+					player.sendTextMessage(c.okay + pluginName + ":>" + c.text + t.get("SUPPORT_SUCCESS", lang));
+				}
 			} else {
 				player.sendTextMessage(c.error + pluginName + ":>" + c.text + t.get("SUPPORT_NOTAVAILABLE", lang));
 			}
@@ -541,11 +547,11 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			settings.load(new InputStreamReader(in, "UTF8"));
 			in.close();
 			// fill global values
-			logLevel = Integer.parseInt(settings.getProperty("logLevel"));
+			logLevel = Integer.parseInt(settings.getProperty("logLevel", "0"));
 			// log.out(settings.getProperty("webHookUrl"),0);
 			postChat = settings.getProperty("postChat", "false").contentEquals("true");
-			webHookChatUrl = settings.getProperty("webHookChatUrl");
-			joinDiscord = settings.getProperty("joinDiscord");
+			webHookChatUrl = settings.getProperty("webHookChatUrl", "");
+			joinDiscord = settings.getProperty("joinDiscord", "");
 			overrideAvatar = settings.getProperty("overrideAvatar", "true").contentEquals("true");
 
 			postStatus = settings.getProperty("postStatus", "false").contentEquals("true");
@@ -553,15 +559,16 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			reportStatusDisabled = settings.getProperty("reportStatusDisabled", "true").contentEquals("true");
 			reportSettingsChanged = settings.getProperty("reportSettingsChanged", "true").contentEquals("true");
 			reportJarChanged = settings.getProperty("reportJarChanged", "true").contentEquals("true");
-			webHookStatusUrl = settings.getProperty("webHookStatusUrl");
-			statusUsername = settings.getProperty("statusUsername");
-			statusEnabledMessage = settings.getProperty("statusEnabledMessage");
-			statusDisabledMessage = settings.getProperty("statusDisabledMessage");
+			webHookStatusUrl = settings.getProperty("webHookStatusUrl", "");
+			statusUsername = settings.getProperty("statusUsername", "");
+			statusEnabledMessage = settings.getProperty("statusEnabledMessage", "");
+			statusDisabledMessage = settings.getProperty("statusDisabledMessage", "");
 			useServerName = settings.getProperty("useServerName", "false").contentEquals("true");
 
 			postSupport = settings.getProperty("postSupport", "false").contentEquals("true");
+			supportScreenshot = settings.getProperty("supportScreenshot", "true").contentEquals("true");
 			addTeleportCommand = settings.getProperty("addTeleportCommand", "true").contentEquals("true");
-			webHookSupportUrl = settings.getProperty("webHookSupportUrl");
+			webHookSupportUrl = settings.getProperty("webHookSupportUrl", "");
 
 			botChatChannelName = settings.getProperty("botChatChannelName", "server-chat");
 			botEnable = settings.getProperty("botEnable", "false").contentEquals("true");
@@ -578,9 +585,9 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			sendPluginWelcome = settings.getProperty("sendPluginWelcome", "true").contentEquals("true");
 
 			// restart settings
-			allowRestart = settings.getProperty("allowRestart").contentEquals("true");
-			restartOnUpdate = settings.getProperty("restartOnUpdate").contentEquals("true");
-			restartMinimumTime = Integer.parseInt(settings.getProperty("restartMinimumTime"));
+			allowRestart = settings.getProperty("allowRestart", "false").contentEquals("true");
+			restartOnUpdate = settings.getProperty("restartOnUpdate", "false").contentEquals("true");
+			restartMinimumTime = Integer.parseInt(settings.getProperty("restartMinimumTime", "0"));
 			log.out(pluginName + " Plugin settings loaded", 10);
 
 			log.out("Will send chat to Discord: " + String.valueOf(postChat), 10);
@@ -637,7 +644,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 * @param i18nIndex
 	 */
 	private void broadcastMessage(String i18nIndex) {
-		this.broadcastMessage(i18nIndex, null);
+		this.broadcastMessage(i18nIndex, "");
 	}
 
 	/**

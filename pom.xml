@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.omegazirkel.risingworld</groupId>
     <artifactId>DiscordPlugin</artifactId>
-    <version>0.13.2</version>
+    <version>0.13.3</version>
     <packaging>jar</packaging>
     <dependencyManagement></dependencyManagement>
     <dependencies>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>net.risingworld</groupId>
             <artifactId>PluginAPI</artifactId>
-            <version>0.9.5.2</version>
+            <version>0.9.5.4</version>
             <scope>system</scope>
             <systemPath>${basedir}/../libs/PluginAPI.jar</systemPath>
         </dependency>

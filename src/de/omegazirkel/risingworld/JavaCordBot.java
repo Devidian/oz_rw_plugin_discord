@@ -116,8 +116,7 @@ public class JavaCordBot implements Runnable {
                         channel.sendMessage("Player " + playerName + " kicked!");
                         pluginInstance.getServer().getAllPlayers().forEach((p) -> {
                             String l = p.getSystemLanguage();
-                            p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>"
-                                    + c.text
+                            p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>" + c.text
                                     + t.get("BC_KICKED", l).replace("PH_PLAYER", playerName)
                                             .replace("PH_DISCORDUSER", author.getDiscriminatedName())
                                             .replace("PH_REASON", reason));
@@ -140,8 +139,7 @@ public class JavaCordBot implements Runnable {
                         channel.sendMessage("Player " + playerName + " banned!");
                         pluginInstance.getServer().getAllPlayers().forEach((p) -> {
                             String l = p.getSystemLanguage();
-                            p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>"
-                                    + c.text
+                            p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>" + c.text
                                     + t.get("BC_BANNED", l).replace("PH_PLAYER", playerName)
                                             .replace("PH_DISCORDUSER", author.getDiscriminatedName())
                                             .replace("PH_REASON", reason));
@@ -166,8 +164,7 @@ public class JavaCordBot implements Runnable {
                                 .replace("PH_GROUP", group));
                         pluginInstance.getServer().getAllPlayers().forEach((p) -> {
                             String l = p.getSystemLanguage();
-                            p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>"
-                                    + c.text
+                            p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>" + c.text
                                     + t.get("BC_GROUP", l).replace("PH_DISCORDUSER", author.getDiscriminatedName())
                                             .replace("PH_PLAYER", playerName).replace("PH_GROUP", group));
                         });
@@ -182,9 +179,8 @@ public class JavaCordBot implements Runnable {
                                     t.get("CMD_OUT_RESTART_DELAY", lang).replace("PH_PLAYERS", playersLeft + ""));
                             pluginInstance.getServer().getAllPlayers().forEach((p) -> {
                                 String l = p.getSystemLanguage();
-                                p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>"
-                                        + c.text + t.get("BC_GROUP", l).replace("PH_DISCORDUSER",
-                                                author.getDiscriminatedName()));
+                                p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>" + c.text + t
+                                        .get("BC_GROUP", l).replace("PH_DISCORDUSER", author.getDiscriminatedName()));
                             });
                             pluginInstance.setFlagRestart(true);
                         }
@@ -233,6 +229,18 @@ public class JavaCordBot implements Runnable {
             }
         };
         api.addMessageCreateListener(messageCreateListener);
+        api.addLostConnectionListener(event -> {
+            log.out("Lost connection to Discord", 999);
+        });
+        api.addReconnectListener(event -> {
+            log.out("Reconnect", 100);
+        });
+        api.addServerBecomesUnavailableListener(event -> {
+            log.out("Server becomes unavailable...", 100);
+        });
+        api.addServerBecomesAvailableListener(event -> {
+            log.out("Server becomes available...", 100);
+        });
     }
 
 }
