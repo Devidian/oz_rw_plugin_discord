@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.13.2] - 2019-03-18
+## Fixed
+- Der Fehler der einen Absturz bei einem Plugin Update verursachte, sollte nun abgefangen werden.
+## Added
+- Fehlende deutsche Übersetzung wurde hinzugefügt
+
 ## [0.13.1] - 2019-03-15
 ## Fixed
 - der support webhook war fälschlicherweise der chat-webhook

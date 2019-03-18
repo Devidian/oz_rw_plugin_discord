@@ -52,7 +52,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "0.13.1";
+	static final String pluginVersion = "0.13.2";
 	static final String pluginName = "DiscordPlugin";
 	static final String pluginCMD = "dp";
 
@@ -451,7 +451,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 * @param channel
 	 * @param image
 	 */
-	private void 	sendDiscordMessage(String username, String text, String channel, byte[] image) {
+	private void sendDiscordMessage(String username, String text, String channel, byte[] image) {
 		try {
 			// Username Validation
 			username = username.replace("@", "").replace("@", "").replace(":", "").replace("`", ""); // remove invalid
@@ -605,9 +605,13 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 */
 	private void broadcastMessage(String i18nIndex, String playerName) {
 		getServer().getAllPlayers().forEach((player) -> {
-			String lang = player.getSystemLanguage();
-			player.sendTextMessage(
-					c.warning + pluginName + ":> " + c.text + t.get(i18nIndex, lang).replace("PH_PLAYER", playerName));
+			try {
+				String lang = player.getSystemLanguage();
+				player.sendTextMessage(c.warning + pluginName + ":> " + c.text
+						+ t.get(i18nIndex, lang).replace("PH_PLAYER", playerName));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		});
 	}
 
@@ -618,9 +622,13 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 */
 	private void broadcastMessage(String i18nIndex, int playerCount) {
 		getServer().getAllPlayers().forEach((player) -> {
-			String lang = player.getSystemLanguage();
-			player.sendTextMessage(c.warning + pluginName + ":> " + c.text
-					+ t.get(i18nIndex, lang).replace("PH_PLAYERS", playerCount + ""));
+			try {
+				String lang = player.getSystemLanguage();
+				player.sendTextMessage(c.warning + pluginName + ":> " + c.text
+						+ t.get(i18nIndex, lang).replace("PH_PLAYERS", playerCount + ""));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		});
 	}
 
@@ -673,7 +681,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 				}
 			}
 		} else {
-			log.out("File changed: <" + file + ">", 0);
+			log.out("onFileCreateEvent: <" + file + ">", 0);
 		}
 	}
 

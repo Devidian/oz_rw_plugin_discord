@@ -1,8 +1,14 @@
 ## [Unreleased]
 
+## [0.13.2] - 2019-03-18
+## Fixed
+- An exception that caused a crash on update should now be catched
+## Added
+- missing German translations were added
+
 ## [0.13.1] - 2019-03-15
 ## Fixed
-- support webhook was incorrectly chat webhook 
+- support webhook was incorrectly chat webhook
 
 ## [0.13.0] - 2019-03-15
 ### Changed
