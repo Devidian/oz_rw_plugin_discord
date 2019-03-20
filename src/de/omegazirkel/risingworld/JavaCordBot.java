@@ -221,8 +221,14 @@ public class JavaCordBot implements Runnable {
                 // Not a (secure) command, maybe chat? check channel
                 String chName = event.getChannel().asServerChannel().map(ServerChannel::getName).orElse(null);
                 if (chName.equalsIgnoreCase(pluginInstance.getBotChatChannelName())) {
-                    server.broadcastTextMessage(pluginInstance.getColorLocalDiscord() + "[LOCAL] "
-                            + author.getDiscriminatedName() + ": " + pluginInstance.getColorText() + content);
+                    String color = pluginInstance.getColorLocalDiscord();
+                    String group = "";
+                    if (canExecuteSecureCommands && pluginInstance.getShowGroupSetting()) {
+                        color = pluginInstance.getColorLocalAdmin();
+                        group = " (discord/admin)";
+                    }
+                    server.broadcastTextMessage(color + "[LOCAL] " + author.getDiscriminatedName() + group + ": "
+                            + pluginInstance.getColorText() + content);
                 } else {
                     log.out("Unknown message in channel <" + chName + ">", 0);
                 }

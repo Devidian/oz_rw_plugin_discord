@@ -52,18 +52,13 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "0.13.3";
+	static final String pluginVersion = "0.14.0";
 	static final String pluginName = "DiscordPlugin";
 	static final String pluginCMD = "dp";
 
 	static final de.omegazirkel.risingworld.tools.Logger log = new de.omegazirkel.risingworld.tools.Logger("[OZ.DP]");
 	static final Colors c = Colors.getInstance();
 	private static I18n t = null;
-
-	static final String colorSupport = "[#782d8e]";
-	static final String colorLocalSelf = "[#ddffdd]";
-	static final String colorLocalOther = "[#dddddd]";
-	static final String colorLocalDiscord = "[#ddddff]";
 
 	// Settings
 	static int logLevel = 0;
@@ -104,6 +99,14 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 
 	static boolean allowScreenshots = true;
 	static int maxScreenWidth = 1920;
+
+	static boolean colorizeChat = true;
+	static boolean showGroup = false;
+	static String colorSupport = "[#782d8e]";
+	static String colorLocalSelf = "[#ddffdd]";
+	static String colorLocalAdmin = "[#db3208]";
+	static String colorLocalOther = "[#dddddd]";
+	static String colorLocalDiscord = "[#ddddff]";
 
 	// END Settings
 	// Live properties
@@ -150,6 +153,14 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 
 	public String getColorLocalDiscord() {
 		return colorLocalDiscord;
+	}
+
+	public String getColorLocalAdmin() {
+		return colorLocalAdmin;
+	}
+
+	public boolean getShowGroupSetting() {
+		return showGroup;
 	}
 
 	@Override
@@ -352,8 +363,10 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 				}
 				this.sendDiscordMessage(player.getName(), noColorText, webHookChatUrl);
 			}
-			broadcastChatMessage(player, noColorText);
-			event.setCancelled(true);
+			if (colorizeChat) {
+				broadcastChatMessage(player, noColorText);
+				event.setCancelled(true);
+			}
 		}
 	}
 
@@ -367,9 +380,18 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			String color = colorLocalOther;
 			if (player.getUID() == eventPlayer.getUID()) {
 				color = colorLocalSelf;
+			} else if (eventPlayer.isAdmin()) {
+				color = colorLocalAdmin;
 			}
 
-			player.sendTextMessage(color + "[LOCAL] " + eventPlayer.getName() + ": " + c.text + noColorText);
+			String group = "";
+
+			if (showGroup) {
+				group = " (" + eventPlayer.getPermissionGroup() + ")";
+			}
+
+			player.sendTextMessage(color + "[LOCAL] " + eventPlayer.getName() + group + ": " + c.text + noColorText);
+
 		});
 	}
 
@@ -576,6 +598,16 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			botToken = settings.getProperty("botToken", "");
 			botLang = settings.getProperty("botLang", "en");
 			botAdmins = settings.getProperty("botAdmins", "");
+
+			// colors
+
+			colorizeChat = settings.getProperty("colorizeChat", "true").contentEquals("true");
+			showGroup = settings.getProperty("showGroup", "false").contentEquals("true");
+			colorSupport = settings.getProperty("colorSupport", "[#782d8e]");
+			colorLocalSelf = settings.getProperty("colorLocalSelf", "[#ddffdd]");
+			colorLocalAdmin = settings.getProperty("colorLocalAdmin", "[#db3208]");
+			colorLocalOther = settings.getProperty("colorLocalOther", "[#dddddd]");
+			colorLocalDiscord = settings.getProperty("colorLocalDiscord", "[#ddddff]");
 
 			// screenshots
 			allowScreenshots = settings.getProperty("allowScreenshots", "true").contentEquals("true");

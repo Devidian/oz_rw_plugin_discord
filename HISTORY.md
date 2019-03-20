@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [0.14.0] - 2019-03-20
+## Added
+- neue Farbeinstellung `colorLocalAdmin` für Admin-Nachrichten (Player.isAdmin)
+- neue Einstellung `colorizeChat` um die manipulation des lokalen chat zu deaktivieren
+- neue Einstellung `showGroup` um die permission group hinter den Spielernamen anzuzeigen
+## Changed
+- Alle farbwerte können jetzt in `settings.properties` eingestellt werden
+
 ## [0.13.3] - 2019-03-18
 ## Added
 - einige Listener zum JavaCordBot hinzugefügt um Verbindungsabbrüche zu loggen.
