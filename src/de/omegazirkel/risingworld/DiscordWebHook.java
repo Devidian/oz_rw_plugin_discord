@@ -10,6 +10,10 @@ import de.omegazirkel.risingworld.tools.FileChangeListener;
 import de.omegazirkel.risingworld.tools.I18n;
 import de.omegazirkel.risingworld.tools.PluginChangeWatcher;
 
+import static java.util.Calendar.DAY_OF_MONTH;
+import static java.util.Calendar.HOUR_OF_DAY;
+import static java.util.Calendar.MINUTE;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -18,8 +22,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
-import java.util.Base64;
+// import java.util.Base64;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+// import java.util.Map;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 
@@ -27,13 +37,26 @@ import net.risingworld.api.Plugin;
 import net.risingworld.api.Server;
 import net.risingworld.api.events.EventMethod;
 import net.risingworld.api.events.Listener;
+import net.risingworld.api.events.npc.NpcDeathEvent;
+import net.risingworld.api.events.npc.NpcDeathEvent.Cause;
 import net.risingworld.api.events.player.PlayerChatEvent;
 import net.risingworld.api.events.player.PlayerCommandEvent;
 import net.risingworld.api.events.player.PlayerConnectEvent;
 import net.risingworld.api.events.player.PlayerDisconnectEvent;
+// import net.risingworld.api.events.player.PlayerMountNpcEvent;
+// import net.risingworld.api.events.player.PlayerPickupItemEvent;
 import net.risingworld.api.events.player.PlayerSpawnEvent;
+// import net.risingworld.api.events.player.world.PlayerDestroyConstructionEvent;
+import net.risingworld.api.events.player.world.PlayerDestroyObjectEvent;
+// import net.risingworld.api.events.player.world.PlayerRemoveConstructionEvent;
+import net.risingworld.api.events.player.world.PlayerRemoveObjectEvent;
+import net.risingworld.api.objects.Npc;
 import net.risingworld.api.objects.Player;
+// import net.risingworld.api.objects.WorldItem;
 import net.risingworld.api.utils.Vector3f;
+import net.risingworld.api.utils.Definitions.NpcDefinition;
+import net.risingworld.api.utils.Definitions.ObjectDefinition;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -52,7 +75,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "0.14.0";
+	static final String pluginVersion = "0.15.0";
 	static final String pluginName = "DiscordPlugin";
 	static final String pluginCMD = "dp";
 
@@ -86,6 +109,13 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 
 	static boolean sendPluginWelcome = false;
 
+	static boolean postTrackedEvents = false;
+	static String webHookEventUrl = "";
+	static Short trackServerLogLevel = 0;
+	static boolean trackMountKill = false;
+	static boolean trackNonHostileAnimalKill = false;
+	static boolean trackPickupables = false;
+
 	static boolean botEnable = false;
 	static boolean botSecure = true;
 	static String botToken = "";
@@ -93,9 +123,12 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	static String botLang = "en";
 	static String botChatChannelName = "server-chat";
 
+	static boolean restartAdminOnly = true;
 	static boolean allowRestart = false;
 	static boolean restartOnUpdate = true;
 	static int restartMinimumTime = 86400;// (60 * 60 * 24); // 1 Day default
+	static boolean restartTimed = false; // restart schedule
+	static int forceRestartAfter = 5; // Minutes
 
 	static boolean allowScreenshots = true;
 	static int maxScreenWidth = 1920;
@@ -108,11 +141,18 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	static String colorLocalOther = "[#dddddd]";
 	static String colorLocalDiscord = "[#ddddff]";
 
+	public static Map<String, Short> discordCommands = new HashMap<>();
+
 	// END Settings
 	// Live properties
 	static boolean flagRestart = false;
 	static Plugin GlobalIntercom = null;
 	static JavaCordBot DiscordBot = null;
+
+	// Timer
+	static Timer restartTimer = new Timer();
+	static TimerTask restartTask = null;
+	static TimerTask restartForcedTask = null;
 
 	// getter
 	public String getBotToken() {
@@ -211,12 +251,20 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 		String command = cmdParts[0];
 
 		if (command.equals("/" + pluginCMD)) {
+			// Invalid number of arguments (0)
+			if (cmdParts.length < 2) {
+				player.sendTextMessage(c.error + pluginName + ":>" + c.text
+						+ t.get("MSG_CMD_ERR_ARGUMENTS", lang).replace("PH_CMD", c.error + command + c.text)
+								.replace("PH_COMMAND_HELP", c.command + "/" + pluginCMD + " help\n" + c.text));
+				return;
+			}
+
 			String option = cmdParts[1];
 
 			switch (option) {
 			case "restart":
-				boolean canTriggerRestart = player.isAdmin()
-						|| (allowRestart && player.getTotalPlayTime() > restartMinimumTime && restartMinimumTime > 0);
+				boolean canTriggerRestart = allowRestart && (player.isAdmin() || (!restartAdminOnly
+						&& player.getTotalPlayTime() > restartMinimumTime && restartMinimumTime > 0));
 				if (canTriggerRestart) {
 					String username = statusUsername;
 					if (useServerName) {
@@ -322,7 +370,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	public void onPlayerChat(PlayerChatEvent event) {
 
 		String message = event.getChatMessage();
-		String noColorText = message.replaceFirst("(\\[#[a-fA-F]+\\])", "");
+		String noColorText = message.replaceFirst("(\\[#[0-9a-fA-F]+\\])", "");
 		Boolean processMessage = postChat;
 
 		if (!processMessage) {
@@ -445,12 +493,95 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 				int playersLeft = server.getPlayerCount() - 1;
 				if (playersLeft == 0) {
 					this.sendDiscordMessage(username, t.get("RESTART_PLAYER_LAST", botLang), webHookStatusUrl);
+					server.saveAll();
 					server.shutdown();
 				} else if (playersLeft > 1) {
 					this.broadcastMessage("BC_PLAYER_REMAIN", playersLeft);
 				}
 			}
 		}
+	}
+
+	/**
+	 *
+	 * @param event
+	 */
+	@EventMethod
+	public void onPlayerRemoveObject(PlayerRemoveObjectEvent event) {
+		ObjectDefinition def = event.getObjectDefinition();
+		Vector3f pos = event.getObjectPosition();
+		String posMap = ((int) pos.x) + (pos.x > 0 ? "W" : "E") + " " + ((int) pos.z) + (pos.z > 0 ? "N" : "S");
+		if (!def.isPickupable() || !trackPickupables)
+			return;
+		String msg = t.get("BAT_OBJECT_REMOVE", botLang).replace("PH_PLAYER", event.getPlayer().getName())
+				.replace("PH_OBJECT_NAME", def.getName()).replace("PH_LOCATION", pos.x + " " + pos.y + " " + pos.z)
+				.replace("PH_MAP_COORDINATES", posMap);
+		log.out(msg, trackServerLogLevel);
+		this.sendDiscordMessage(statusUsername, msg, webHookEventUrl);
+	}
+
+	/**
+	 *
+	 * @param event
+	 */
+	@EventMethod
+	public void onPlayerDestroyObject(PlayerDestroyObjectEvent event) {
+		ObjectDefinition def = event.getObjectDefinition();
+		Vector3f pos = event.getObjectPosition();
+		String posMap = ((int) pos.x) + (pos.x > 0 ? "W" : "E") + " " + ((int) pos.z) + (pos.z > 0 ? "N" : "S");
+		if (!def.isPickupable() || !trackPickupables)
+			return;
+		String msg = t.get("BAT_OBJECT_DESTROY", botLang).replace("PH_PLAYER", event.getPlayer().getName())
+				.replace("PH_OBJECT_NAME", def.getName()).replace("PH_LOCATION", pos.x + " " + pos.y + " " + pos.z)
+				.replace("PH_MAP_COORDINATES", posMap);
+		log.out(msg, trackServerLogLevel);
+		this.sendDiscordMessage(statusUsername, msg, webHookEventUrl);
+	}
+
+	/**
+	 * track mount and non aggressive animal deaths
+	 *
+	 * @param event
+	 */
+	@EventMethod
+	public void onNpcDeath(NpcDeathEvent event) {
+		// log.out("NPC DEATH EVENT: " + event.getCause().toString() + " / " +
+		// Cause.KilledByPlayer);
+		Npc npc = event.getNpc();
+		NpcDefinition def = npc.getDefinition();
+		Vector3f pos = event.getDeathPosition();
+		String posString = pos.x + " " + pos.y + " " + pos.z;
+		String posMap = ((int) pos.x) + (pos.x > 0 ? "W" : "E") + " " + ((int) pos.z) + (pos.z > 0 ? "N" : "S");
+		if (event.getCause() != Cause.KilledByPlayer) {
+			return;
+		}
+		Player player = (Player) event.getKiller();
+
+		// log.out("NPC TYPE: " + npc.getType() + " / " + Npc.Type.Mount + " | " +
+		// Npc.Type.Animal + "("
+		// + npc.getDefinition().getBehaviour() + ")");
+		// log.out(npc.getType() + "==" + Npc.Type.Mount + "&&" + trackMountKill);
+		// log.out("|" + npc.getType() + "==" + Npc.Type.Animal + "&&" +
+		// trackNonHostileAnimalKill + "&&"
+		// + !npc.getDefinition().getBehaviour().equalsIgnoreCase("AGGRESSIVE"), 0);
+		if (npc.getType() == Npc.Type.Mount && trackMountKill) {
+			// a mount was killed
+			String msg = t.get("BAT_KILL_MOUNT", botLang).replace("PH_PLAYER", player.getName())
+					.replace("PH_NPC_NAME", def.getName()).replace("PH_LOCATION", posString)
+					.replace("PH_MAP_COORDINATES", posMap);
+			log.out(msg, trackServerLogLevel);
+			this.sendDiscordMessage(statusUsername, msg, webHookEventUrl);
+		} else if (npc.getType() == Npc.Type.Animal && trackNonHostileAnimalKill
+				&& !npc.getDefinition().getBehaviour().equalsIgnoreCase("AGGRESSIVE")) {
+			// Non agressive animal was killed
+			String msg = t.get("BAT_KILL_ANIMAL", botLang).replace("PH_PLAYER", player.getName())
+					.replace("PH_NPC_NAME", def.getName()).replace("PH_LOCATION", posString)
+					.replace("PH_MAP_COORDINATES", posMap);
+			log.out(msg, trackServerLogLevel);
+
+			this.sendDiscordMessage(statusUsername, msg, webHookEventUrl);
+		}
+
 	}
 
 	/**
@@ -559,6 +690,26 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	}
 
 	/**
+	 * public API for status channel
+	 *
+	 * @param username
+	 * @param text
+	 */
+	public void sendDiscordStatusMessage(String username, String text) {
+		sendDiscordMessage(username, text, webHookStatusUrl);
+	}
+
+	/**
+	 * public API for event channel
+	 *
+	 * @param username
+	 * @param text
+	 */
+	public void sendDiscordEventMessage(String username, String text) {
+		sendDiscordMessage(username, text, webHookEventUrl);
+	}
+
+	/**
 	 *
 	 */
 	private void initSettings() {
@@ -599,6 +750,39 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			botLang = settings.getProperty("botLang", "en");
 			botAdmins = settings.getProperty("botAdmins", "");
 
+			// discord bot commands
+			discordCommands.put("help", Short.parseShort(settings.getProperty("botCMDhelp", "1")));
+			discordCommands.put("version", Short.parseShort(settings.getProperty("botCMDversion", "1")));
+			discordCommands.put("online", Short.parseShort(settings.getProperty("botCMDonline", "1")));
+			discordCommands.put("weather", Short.parseShort(settings.getProperty("botCMDweather", "1")));
+			discordCommands.put("time", Short.parseShort(settings.getProperty("botCMDtime", "1")));
+			discordCommands.put("banned", Short.parseShort(settings.getProperty("botCMDbanned", "1")));
+
+			discordCommands.put("restart", Short.parseShort(settings.getProperty("botCMDrestart", "2")));
+			discordCommands.put("support", Short.parseShort(settings.getProperty("botCMDsupport", "2")));
+			discordCommands.put("kick", Short.parseShort(settings.getProperty("botCMDkick", "2")));
+			discordCommands.put("ban", Short.parseShort(settings.getProperty("botCMDban", "2")));
+			discordCommands.put("group", Short.parseShort(settings.getProperty("botCMDgroup", "2")));
+			discordCommands.put("yell", Short.parseShort(settings.getProperty("botCMDyell", "2")));
+			discordCommands.put("bc", Short.parseShort(settings.getProperty("botCMDbc", "2")));
+			discordCommands.put("unban", Short.parseShort(settings.getProperty("botCMDunban", "2")));
+			discordCommands.put("tptp", Short.parseShort(settings.getProperty("botCMDtptp", "2")));
+			discordCommands.put("mkadmin", Short.parseShort(settings.getProperty("botCMDmkadmin", "2")));
+			discordCommands.put("unadmin", Short.parseShort(settings.getProperty("botCMDunadmin", "2")));
+			discordCommands.put("setweather", Short.parseShort(settings.getProperty("botCMDsetweather", "2")));
+			discordCommands.put("settime", Short.parseShort(settings.getProperty("botCMDsettime", "2")));
+			discordCommands.put("sethealth", Short.parseShort(settings.getProperty("botCMDsethealth", "2")));
+			discordCommands.put("sethunger", Short.parseShort(settings.getProperty("botCMDsethunger", "2")));
+			discordCommands.put("setthirst", Short.parseShort(settings.getProperty("botCMDsetthirst", "2")));
+			// badass stuff
+			postTrackedEvents = settings.getProperty("postTrackedEvents", "false").contentEquals("true");
+			webHookEventUrl = settings.getProperty("webHookEventUrl", "");
+			trackServerLogLevel = Short.parseShort(settings.getProperty("trackServerLogLevel", "100"));
+			trackMountKill = settings.getProperty("trackMountKill", "false").contentEquals("true");
+			trackNonHostileAnimalKill = settings.getProperty("trackNonHostileAnimalKill", "false")
+					.contentEquals("true");
+			trackPickupables = settings.getProperty("trackPickupables", "false").contentEquals("true");
+
 			// colors
 
 			colorizeChat = settings.getProperty("colorizeChat", "true").contentEquals("true");
@@ -614,12 +798,27 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			maxScreenWidth = Integer.parseInt(settings.getProperty("maxScreenWidth", "1920"));
 
 			// motd settings
-			sendPluginWelcome = settings.getProperty("sendPluginWelcome", "true").contentEquals("true");
+			sendPluginWelcome = settings.getProperty("sendPluginWelcome", "false").contentEquals("true");
 
 			// restart settings
+			restartTimed = settings.getProperty("restartTimed", "false").contentEquals("true");
 			allowRestart = settings.getProperty("allowRestart", "false").contentEquals("true");
+			restartAdminOnly = settings.getProperty("restartAdminOnly", "false").contentEquals("true");
 			restartOnUpdate = settings.getProperty("restartOnUpdate", "false").contentEquals("true");
-			restartMinimumTime = Integer.parseInt(settings.getProperty("restartMinimumTime", "0"));
+			restartMinimumTime = Integer.parseInt(settings.getProperty("restartMinimumTime", "86400"));
+			forceRestartAfter = Integer.parseInt(settings.getProperty("forceRestartAfter", "0"));
+
+			// parse next restart time (we only need the next beacause we have to lookup
+			// again after restart)
+			String restartTimesString = settings.getProperty("restartTimes", "00:00");
+
+			// log.out("restartTimed: " + restartTimed + " restartTimesString: " +
+			// restartTimesString, 10);
+			if (restartTimed) {
+				String[] restartTimes = restartTimesString.split("\\|");
+				initRestartSchedule(restartTimes);
+			}
+
 			log.out(pluginName + " Plugin settings loaded", 10);
 
 			log.out("Will send chat to Discord: " + String.valueOf(postChat), 10);
@@ -634,6 +833,121 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			log.out("NumberFormatException on initSettings: " + ex.getMessage(), 100);
 		} catch (Exception ex) {
 			log.out("Exception on initSettings: " + ex.getMessage(), 100);
+		}
+	}
+
+	/**
+	 *
+	 * @param times
+	 */
+	private void initRestartSchedule(String[] times) {
+		try {
+			// log.out("initRestartSchedule: " + times.length + " items", 10);
+			Calendar cal = Calendar.getInstance();
+			int minHour = 24;
+			int minMinute = 60;
+			int nextHour = -1;
+			int nextMinute = -1;
+			for (String time : times) {
+				String[] timeParts = time.split(":");
+				int hour = Integer.parseInt(timeParts[0]);
+				int minute = Integer.parseInt(timeParts[1]);
+				// log.out("checking: " + hour + ":" + minute, 10);
+				// get min time if we have to jump to the next day
+				if (hour <= minHour) {
+					minHour = hour;
+					if (minute <= minMinute) {
+						minMinute = minute;
+					}
+				}
+				// look for the next time to restart (nearest)
+				// Same hour but greater minutes
+				if (hour == cal.get(HOUR_OF_DAY) && minute > cal.get(MINUTE)
+						&& (nextMinute < 0 || nextMinute > minute)) {
+					log.out("new time found: " + hour + ":" + minute, 10);
+					nextHour = hour;
+					nextMinute = minute;
+					// if hour is greater than current AND nextHour is not set or greater than hour
+					// AND nextMinute is not set or hour is equal nextHour and nextMinute is greater
+				} else if (hour > cal.get(HOUR_OF_DAY) && (nextHour < 0 || nextHour >= hour)
+						&& (nextMinute < 0 || (hour == nextHour && nextMinute > minute))) {
+					log.out("new time found: " + hour + ":" + minute, 10);
+					nextHour = hour;
+					nextMinute = minute;
+				}
+
+			}
+
+			if (nextHour < 0) {
+				// in this case there was no time found on the current day bigger than now
+				// so the next restart may be tomorrow
+				// log.out("using next day time: " + minHour + ":" + minMinute, 10);
+				nextHour = minHour;
+				nextMinute = minMinute;
+			}
+
+			if (nextHour < cal.get(HOUR_OF_DAY) || (nextHour == cal.get(HOUR_OF_DAY) && nextMinute < cal.get(MINUTE))) {
+				cal.set(DAY_OF_MONTH, cal.get(DAY_OF_MONTH) + 1);
+			}
+			cal.set(HOUR_OF_DAY, nextHour);
+			cal.set(MINUTE, nextMinute);
+
+			log.out("Next Server restart time is scheduled on " + nextHour + ":" + nextMinute, 10);
+
+			if (restartTask != null) {
+				restartTask.cancel();
+			}
+
+			restartTask = new TimerTask() {
+				@Override
+				public void run() {
+					Server server = getServer();
+					int playerNum = server.getAllPlayers().size();
+					if (playerNum > 0) {
+						log.out("Setting restart flag for scheduled server-restart", 10);
+						broadcastMessage("RS_SCHEDULE_INFO");
+						flagRestart = true;
+						if (forceRestartAfter > 0) {
+							broadcastMessage("RS_SCHEDULE_WARN", forceRestartAfter);
+						}
+					} else {
+						log.out("Restarting server now (scheduled)", 10);
+						server.saveAll();
+						server.shutdown();
+					}
+				}
+			};
+
+			restartTimer.schedule(restartTask, cal.getTime());
+
+			// force restarting
+			if (forceRestartAfter > 0) {
+				if (restartForcedTask != null) {
+					restartForcedTask.cancel();
+				}
+
+				restartForcedTask = new TimerTask() {
+					@Override
+					public void run() {
+						log.out("Force server restart now!", 10);
+						Server server = getServer();
+						server.getAllPlayers().forEach(p -> {
+							p.kick("Server restart");
+						});
+						server.saveAll();
+						server.shutdown();
+					}
+				};
+
+				cal.set(MINUTE, nextMinute + forceRestartAfter);
+				restartTimer.schedule(restartForcedTask, cal.getTime());
+			}
+
+			// clear canceled tasks;
+			restartTimer.purge();
+
+		} catch (Exception e) {
+			log.out(e.getLocalizedMessage(), 999);
 		}
 	}
 
@@ -657,14 +971,14 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	/**
 	 *
 	 * @param i18nIndex
-	 * @param playerCount
+	 * @param number
 	 */
-	private void broadcastMessage(String i18nIndex, int playerCount) {
+	private void broadcastMessage(String i18nIndex, int number) {
 		getServer().getAllPlayers().forEach((player) -> {
 			try {
 				String lang = player.getSystemLanguage();
 				player.sendTextMessage(c.warning + pluginName + ":> " + c.text
-						+ t.get(i18nIndex, lang).replace("PH_PLAYERS", playerCount + ""));
+						+ t.get(i18nIndex, lang).replace("PH_NUMBER", number + ""));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -716,6 +1030,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 				if (server.getPlayerCount() > 0) {
 					flagRestart = true;
 				} else {
+					server.saveAll();
 					server.shutdown();
 				}
 			}

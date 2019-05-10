@@ -1,69 +1,152 @@
-# Aktuelle Features:
-- Ingame-Chat in einen Discord-Kanal posten mit Ingame-Spielernamen
-- Logins/Logouts in einen Discord-Kanal posten
-- Support Anfragen die ingame per "/support [nachricht]" gesendet werden können
-- Jeder Discord Kanal (chat,support,status) kann über einen eigenen webHook gesendet werden
-- Server neustart durch Admin per /ozrestart nachdem alle Spieler ausgeloggt haben.
-- Server neustart kann optional für Spieler aktiviert werden wenn sie eine bestimmte totalPlaytime aufweisen (echt-Zeit die sie auf dem Server verbracht haben)
-- Server erkennt updates in settings.properties und läd diese neu. Kann optional in den Discord status Kanal gepostet werden
-- Server erkennt Änderungen am JAR file und reagiert (wenn aktiviert) mit einem neustart des servers (oder aber setzt das restart flag falls noch spieler online sind) Wird im Spiel und optional in Discord reported
-- Spieler können mit /joinDiscord dem Discord des Servers beitreten sofern es konfiguriert wurde
-- Support Nachrichten haben automatisch einen screenshot beigefügt
-- Mit `+screen` im chat kann ein screenshot in den discord kanal hochgeladen werden
+# Current features:
+- post ingame chat to Discord with usernames
+- post server status messages such as login, logout, startup and shutdown to Discord
+- post support messages using `/support [message]` to a Discord channel
+- every Discord channel can have its own webHook (chat, support and status)
+- admins can trigger server restart with `/ozrestart` that is executed after the last player left the server (it causes server shutdown, you need to be sure that server comes up automatically after that)
+- player can trigger server restart too (if you confgure it), but only if they have spent an amount of real-time on your server that you can define (default:1 day, if you play 2h a day you need 12 days to achive this)
+- plugin detects changes to settings.properties and reloads them. A message can be sent to discord if you like.
+- plugin detects changes to jar files and sets restart flag if you like. Can also report this to discord and ingame chat
+- players can type /joinDiscord to join your discord if you configure this
+- support messages now have a screenshot attached
+- normal chat messages wich contain `+screen` have a screenshot uploaded to discord
+- `Badass Tracker` tracks kills (mounts, non hostile animals) and remove/destroy of objects
+- Public API for other plugins (status/event channel)
+- Multiple server restarts can be scheduled (sets restart flag and restarts if all players have left, sends message to all players to inform them)
+- Scheduled restart can be forced after atleast one minute time, players will be kicked before server restarts
 
-# Geplante Features:
-Aktuell keine weiteren
+# Planned features:
+- currently none
 
-# Befehle im Spiel:
+# Commands ingame:
 |Command|Description|
 |---|---|
 |/support [text]|sends [text] as support message to Discord|
 |/dp restart|set restart flag to shutdown server after last player has left|
-|/joinDiscord|join the servers Discord server| 
+|/joinDiscord|join the servers Discord server|
+|/dp info|Show plugin description|
+|/dp help|Show plugin commands|
+|/dp status|Show current plugin status (version, connection, language,...)|
 
-# Befehle discord:
+# Commands discord:
 |Command|Description|
 |---|---|
-|/support [playername] [text]|sendet eine Nachricht an einen Spieler (muss online sein)|
-|/restart|set restart flag to shutdown server after last player has left|
-|!online|lists all players that are currently online|
+|**informative commands:**||
+|?help                         | shows a list of all available commands|
+|?version                      | show current version installed|
+|?online                       | show a list of all players currently online|
+|?weather                      | shows the current ingame weather|
+|?time                         | shows the current ingame time|
+|?banned                       | shows a list of banned players with name, UID and reason|
+|**administrative commands:**||
+|/restart                      | set restart flag to shutdown server after last player has left|
+|/support [PLAYERNAME] [TEXT]  | sends a text message to a player (must be online)|
+|/kick [PLAYERNAME] [REASON?]  | kick player with an optional reason|
+|/ban [PLAYERNAME] [REASON?]   | ban a player with an optional reason|
+|/group [PLAYERNAME] [GROUP]   | set player group|
+|/yell [TEXT]                  | send a text to the server as yell message|
+|/bc [TYPE] [TEXT]             | send a broadcast message with identifier [TYPE] to all players|
+|/unban [UID]                  | unban a player by his uid|
+|/tptp [PLAYER_A] [PLAYER_B]   | teleport Player A to Player B if both are online|
+|/mkadmin [PLAYER]             | grant player admin status|
+|/unadmin [PLAYER]             | revoke player admin status|
+|/setweather [Weather]            | set weather on the server|
+|/settime [HOUR] [MINUTE]      | set current ingame time|
+|/sethealth [PLAYER] [VALUE]   | set players health to value|
+|/sethunger [PLAYER] [VALUE]   | set players hunger to value|
+|/setthirst [PLAYER] [VALUE]   | set players thirst to value|
+
+# Installation (prebuild)
+Download the latest zip files from [here (shared)](https://github.com/Devidian/oz_rw_plugin_tools/releases) and [here (Discord Plugin)](https://github.com/Devidian/oz_rw_plugin_discord/releases) and unpack them into your plugins folder.
+
+## Filetree
+
+Should look like this:
+
+```css
+    ── RisingWorld
+        ├── plugins
+        │    ├── DiscordPlugin
+        │    │    ├── i18n...
+        │    │    ├── lib...
+        │    │    ├── HISTORY.de.md
+        │    │    ├── HISTORY.md
+        │    │    ├── OZ-DiscordPlugin.jar
+        │    │    ├── README.de.md
+        │    │    ├── README.md
+        │    │    └── settings.properties
+        │    ├── shared
+        │    │    ├── assets...
+        │    │    └── lib
+        │    │         ├── HISTORY.md
+        │    │         └── tools.jar
+        :    :
+```
 
 # Build (Maven):
-Für den build (package) prozess benötigt ihr im Übergeordneten Verzeichnis dieses Projekts einen Ordner `libs` mit der `PluginAPI.jar`
-Siehe auch: https://forum.rising-world.net/thread/4743-getting-started/
+You have to create a new folder in your projects parent folder called `libs` and insert `PluginAPI.jar` from RisingWorld.
+See also: https://forum.rising-world.net/thread/4743-getting-started/
 
+## Installation after build:
+just copy `dist/DiscordPlugin` folder after build into your plugin folder, thats it!
 
-# Installation nach build:
-
-Einfach den `dist/DiscordPlugin` Ordner in den Plugin Ordner verschieben, fertig!
-
-## Konfiguration
-Die Datei settings.properties anpassen und nach deinen Wünschen anpassen
+# Configuration
+The settings.properties contains all you need to configure this plugin
 
 | setting  |  default | description  |
 |---|---|---|
-|  logLevel |  0 | Logging to server console higher values means less output 0=all (debug)  |
+|**General plugin settings**|||
+|logLevel|0|Logging to server console higher values means less output 0=all (debug)|
+|restartOnUpdate|false|if true, restart flag is set automatically if plugin file has changed on the server|
+|sendPluginWelcome|false|-|
+|**JavaCord settings**|||
 |botEnable|false|Enables usage of DiscordBot|
 |botSecure|true|Only Bot owner can use commands if `true`|
 |botToken||the token for your bot|
-|joinDiscord||the code to join discord (not the full url!)|
-|  postChat |  false | if true, chat is posted to the webHook for Chat  |
-|  webHookChatUrl |   | this is the webHook used for ingame chat  |
-|  postStatus | false  | if true, server status messages like player login/out is send to the webHook for Status  |
-|  useServerName | false  | if true, the servername is used as username for status posts  |
-|  reportStatusEnabled | true  | if true, a message will be posted when the plugin is enabled (server boot)  |
-|  reportStatusDisabled | true  | if true, a message will be posted when the plugin is disabled (server shutdown)  |
-|  reportSettingsChanged | true  | if true, a message will be posted if settings.properties has changed  |
-|  reportJarChanged | true  | if true, a message will be posted if the jar file has changed (plugin update for example) |
-|  statusEnabledMessage |   | the message that will be posted to discord on plugin enable  |
-|  statusDisabledMessage |   | the message that will be posted to discord on plugin disable  |
-|  statusUsername |   | the fixed username to use for status messages  |
-|  webHookStatusUrl |   | this is the webHook used for status messages  |
-|  postSupport |   |   |
-|  webHookSupportUrl |   | this is the webHook used for support messages  |
-|  addTeleportCommand | true  | if true, a teleport command is added to the support message  |
-|  sendMOTD | true  | if true, player will see MOTD on login  |
-|  motd |   | this is the message player will see on login  |
+|botLang|en|-|
+|botChatChannelName|server-chat|-|
+|botAdmins||-|
+|**other plugin settings**|||
 |allowRestart|false|if true, normal players are allowed to use /ozrestart after they played `restartMinimumTime` seconds on the server|
-|restartOnUpdate|true|if true, restart flag is set automatically if plugin file has changed on the server|
 |restartMinimumTime|86400|player must play at least this time in seconds to use restart feature|
+|allowScreenshots|true|-|
+|joinDiscord||the code to join discord (not the full url!)|
+|restartTimed|false|enable or disable scheduled restart feature|
+|restartTimes|00:00|set restart times for scheduled restart use hh:mm to add multiple values split them with a pipe|
+|forceRestartAfter|0|force restart after this time (minutes) (0 if you do not want to force restart)|
+|**Chat settings**|||
+|postChat |  false | if true, chat is posted to the webHook for Chat  |
+|webHookChatUrl |   | this is the webHook used for ingame chat  |
+|overrideAvatar|true|-|
+|**Status settings**|||
+|postStatus | false  | if true, server status messages like player login/out is send to the webHook for Status  |
+|useServerName | false  | if true, the servername is used as username for status posts  |
+|reportStatusEnabled | true  | if true, a message will be posted when the plugin is enabled (server boot)  |
+|reportStatusDisabled | true  | if true, a message will be posted when the plugin is disabled (server shutdown)  |
+|reportSettingsChanged | true  | if true, a message will be posted if settings.properties has changed  |
+|reportJarChanged | true  | if true, a message will be posted if the jar file has changed (plugin update for example) |
+|statusEnabledMessage |   | the message that will be posted to discord on plugin enable  |
+|statusDisabledMessage |   | the message that will be posted to discord on plugin disable  |
+|statusUsername |   | the fixed username to use for status messages  |
+|webHookStatusUrl |   | this is the webHook used for status messages  |
+|**Support settings**|||
+|postSupport|false|-|
+|supportScreenshot|true|-|
+|webHookSupportUrl||this is the webHook used for support messages  |
+|addTeleportCommand|true|if true, a teleport command is added to the support message  |
+|**Color & Chat settings**|||
+|maxScreenWidth|1920|-|
+|colorizeChat|true|-|
+|showGroup|false|-|
+|colorSupport|[#782d8e]|-|
+|colorLocalSelf|[#ddffdd]|-|
+|colorLocalAdmin|[#db3208]|-|
+|colorLocalOther|[#dddddd]|-|
+|colorLocalDiscord|[#ddddff]|-|
+|**Badass/Event Tracker settings**|||
+|postTrackedEvents|false|-|
+|webHookEventUrl||-|
+|trackServerLogLevel|100|-|
+|trackMountKill|false|-|
+|trackNonHostileAnimalKill|false|-|
+|trackPickupables|false|-|

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.omegazirkel.risingworld</groupId>
     <artifactId>DiscordPlugin</artifactId>
-    <version>0.14.0</version>
+    <version>0.15.0</version>
     <packaging>jar</packaging>
     <dependencyManagement></dependencyManagement>
     <dependencies>
@@ -11,12 +11,12 @@
         <dependency>
             <groupId>org.javacord</groupId>
             <artifactId>javacord-api</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.javacord</groupId>
             <artifactId>javacord-core</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.4</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
         <dependency>
@@ -28,19 +28,19 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.6</version>
+            <version>4.5.8</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.4.10</version>
+            <version>4.4.11</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>4.5.7</version>
+            <version>4.5.8</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
         <dependency>
@@ -65,9 +65,9 @@
         <dependency>
             <groupId>de.omegazirkel.risingworld</groupId>
             <artifactId>tools</artifactId>
-            <version>0.4.1</version>
+            <version>0.6.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}/../libs/tools-0.4.1.jar</systemPath>
+            <systemPath>${basedir}/../libs/tools-0.6.0.jar</systemPath>
         </dependency>
     </dependencies>
     <build>

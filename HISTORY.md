@@ -1,168 +1,218 @@
 ## [Unreleased]
 
+## [0.15.0] - 2019-05-10
+### Added
+- DiscordBot now send reaction if command was executed successfully
+- New tracking of `badass` actions with new webhook url
+    - tracking mount kills
+    - tracking non hostile animal kills
+    - tracking pickup of items like workbenches
+- Settings for `Badass Tracker`
+    - `postTrackedEvents` enables or disables this feature
+    - `webHookTrackUrl` set the webhook where the messages will be posted to
+    - `trackServerLogLevel` set the log level to send messages into server log files
+    - `trackMountKill` enable or disable tracking of killed mounts
+    - `trackNonHostileAnimalKill` enable or disable tracking of non hostile animals
+    - `trackPickupCraftingStation` enable or disable tracking of pickup non related stuff
+- Public API for Status messages
+- Restart scheduler
+- Settings for `Restart scheduler`
+    - `restartTimed` enables or disables this feature
+    - `restartTimes` times to restart (hh:mm), multiple seperated by `|`
+    - `forceRestartAfter` minutes after restart is forced and players kicked (0 to disable forced-restart)
+- New Discord `informational` commands
+    - `?weather` shows the current ingame weather
+    - `?time` shows the current ingame time
+    - `?banned` shows a list of banned players with name, UID and reason
+- New Discord `admin` commands
+    - `/unban [UID]` unban a player by his uid
+    - `/tptp [PLAYER_A] [PLAYER_B]` teleport Player A to Player B if both are online
+    - `/mkadmin [PLAYER]` grant player admin status
+    - `/unadmin [PLAYER]` revoke player admin status
+    - `/setweather [Weather]` set weather on the server
+    - `/settime [HOUR] [MINUTE]` set current ingame time
+    - `/sethealth [PLAYER] [VALUE]` set players health to value
+    - `/sethunger [PLAYER] [VALUE]` set players hunger to value
+    - `/setthirst [PLAYER] [VALUE]` set players thirst to value
+- New Settings
+    - `restartAdminOnly` if set to true only admins can trigger ingame restart (default=true)
+    - `botCMD*` for discord bot commands. Will disable(0), enable for all(1) or enable just for admins(2)
+### Fixed
+- Exception thrown when typeing `/gi` without parameter
+- JavaCordBot removes now all listener on disconnect
+- `noColorText` regexp was missing numbers
+### Changed
+- default language of *.md files is now English
+- informational command prefix is now `?` instead of `!` see `?help` in discord or README
+- setting `allowRestart` will disable ingame restart command for all now if set to false
+### Updated
+- Maven dependencies (JavaCord 3.0.1 -> 3.0.4)
+
 ## [0.14.0] - 2019-03-20
-## Added
-- neue Farbeinstellung `colorLocalAdmin` für Admin-Nachrichten (Player.isAdmin)
-- neue Einstellung `colorizeChat` um die manipulation des lokalen chat zu deaktivieren
-- neue Einstellung `showGroup` um die permission group hinter den Spielernamen anzuzeigen
-## Changed
-- Alle farbwerte können jetzt in `settings.properties` eingestellt werden
+### Added
+- new color `colorLocalAdmin` for local admin color (Player.isAdmin)
+- new flag `colorizeChat` to deactivate local chat manipulation
+- new flag `showGroup` to show permission groups behind player names
+### Changed
+- all colors moved to `settings.properties` if someone likes to change them
 
 ## [0.13.3] - 2019-03-18
-## Added
-- einige Listener zum JavaCordBot hinzugefügt um Verbindungsabbrüche zu loggen.
-- neue Einstellung in den `settings.properties` => `supportScreenshot` um automatischen screenshot bei support nachrichten einzustellen
-## Fixed
-- Fehler der den Absturz vor 0.13.2 verursacht hatte wurde behoben
+### Added
+- some listener added to JavaCordBot to log lost connections.
+- new property in `settings.properties` => `supportScreenshot` to enable or disable auto-screenshot in support messages
+### Fixed
+- the exception that caused crash before 0.13.2 is now fixed
 
 ## [0.13.2] - 2019-03-18
-## Fixed
-- Der Fehler der einen Absturz bei einem Plugin Update verursachte, sollte nun abgefangen werden.
-## Added
-- Fehlende deutsche Übersetzung wurde hinzugefügt
+### Fixed
+- An exception that caused a crash on update should now be catched
+### Added
+- missing German translations were added
 
 ## [0.13.1] - 2019-03-15
-## Fixed
-- der support webhook war fälschlicherweise der chat-webhook
+### Fixed
+- support webhook was incorrectly chat webhook
 
 ## [0.13.0] - 2019-03-15
 ### Changed
-- verwendet nun die tools.jar in Version 0.4.1
-- textfarben wurden aus `DiscordWebHook` Klasse entfernt, Colors aus tools wird jetzt verwendet
-- MOTD entfernt, heisst jetzt Plugin Welcome Message und kann nur noch ein und aus geschaltet werden, definition des textes ist jetzt in den Sprachdateien, damit jeder Spieler die Nachricht in seiner Sprache lesen kann (sofern übersetzt wurde)
-- "Plugin geladen" Meldung wird jetzt in onEnabled gefeuert
-- in initSettings wird jetzt "Einstellungen geladen" in das serverlog geschrieben
+- now using tools.jar in version 0.4.1
+- text colors were removed from `DiscordWebHook` class, now Colors from tools will be used
+- motd removed, its now called `plugin welcome message` and can only be turned on/off in the settings. The text definition has moved to the language files so every user can read the plugin welcome in his language (so far translated)
+- Plugin enabled message now triggert in onEnabled
+- initSettings now sends settings loaded message to serverlog
 ### Added
-- wenn `+screen` in eine Nachricht geschrieben wird, wird ein screenshot übermittelt der in Discord angezeigt werden kann (nicht ingame)
-- in den `settings.properties` kann eingestellt werden ob screenshots erlaubt sind und welche maximale Auflösung übertragen werden soll (angabe der breite)
-- bei support nachrichten wird immer ein screenshot gesendet (kann sich in Zukunft vielleicht noch ändern)
+- if you write `+sceen` into a chat message, a screenshot will be uploaded that can be viewed in discord (not ingame)
+- in the `settings.properties` you can set screenshots on/off and the maximum screen resolution (width of the image)
+- support messages will always have a screenshot attached (may change in future)
 
 ## [0.12.0] - 2019-01-30
 ### Added
-- Befehle die mit `/dp` beginnen hinzugefügt
-- neuer Befehl `/dp info` zeigt die Beschreibung des Plugins
-- neuer Befehl `/dp help` zeigt alle möglichen Befehle des Plugins
-- neuer Befehl `/dp status` zeigt den aktuellen Status des Plugins wie Version und Sprache
+- added commands starting with `/dp`
+- new command `/dp info` shows description for this plugin
+- new command `/dp help` shows usage help for this plugin
+- new command `/dp status` shows current status of the plugin, like version and language
 
 ### Changed
-- die log methode in `DiscordWebHook` wurde durch den Logger aus `tools` ersetzt
-- `JavaCordBot` hat nun seinen eigenen Logger aus `tools`
-- broadcast Nachrichten werden nun anhand der Spieler-Systemsprache übersetzt
-- Befehls-Nachrichten werden nun auch anhand der Spieler-Systemsprache übersetzt
-- `/ozrestart` ist jetzt deprecated und wird bald entfernt, verwende `/dp restart` statt dessen
-- Alle Nachrichten haben nun ein Plugin-prefix
+- replaced log method in `DiscordWebHook` class with Logger from `tools`
+- `JavaCordBot` class now has its own Logger from `tools`
+- broadcast messages are now translated by player system language
+- command messages are now translated by player system language
+- `/ozrestart` is now deprecated and will be removed in a later version use `/dp restart` instead
+- all messages now have a plugin prefix
 
 ## [0.11.5] - 2019-01-27
 ### Changed
-- Die plugin-übergreifende `tools.jar` muss nun unter `/plugins/shared/lib/tools.jar` zur Verfügung stehen
+- the plugin-shared lib `tools.jar` must now be placed into `/plugins/shared/lib/tools.jar`
 
 ## [0.11.4] - 2019-01-26
 ### Changed
-- tools.jar auf 0.2.0 aktualisiert
+- tools.jar updated to 0.2.0
 
 ### Version 0.11.3
-- Behoben: GI prefix `#%` entfernt und leere Nachrichten ignorieren
-- Hinzugefügt: Weitere Textbausteine sind nun übersetzt
+- fixed: remove #% prefix, ignore empty messages
+- added: more text-output translations
 
 ### Version 0.11.2
-- Hinzugefügt: in den settings können jetzt weitere Discord-Admins hinzugefügt werden, Beispiel: `botAdmins=Devidian#1334,SomeOneElse#1337`
-- Hinzugefügt: weitere übersetzungen von Textausgaben
+- added: in the settings you can now add other Discord User that are allowed to execute secure commands, example: `botAdmins=Devidian#1334,SomeOneElse#1337`
+- added: more text-output translations
 
 ### Version 0.11.1
-- Behoben: das neue Tools Plugin wird nicht immer zuerst geladen, daher ist dies jetzt ein normales jar das unter lib beigefügt wird.
+- fixed: as the new tools plugin is not loaded in first place it is now converted to a normal jar that comes within the lib folder.
 
 ### Version 0.11.0
-- Geändert: alle tools wurden entfernt und in ein eigenes jar/plugin gepackt, damit sie auch in anderen Plugins verwendet werden können ohne copy&paste
+- changed: removed all tools and moved them into a new plugin, so they can used in other plugins without copy&paste
 
 ### Version 0.10.3
-- Geändert: überschreiben der avatar_url ist jetzt  optional, kann in den settings geändert werden mit `overrideAvatar=true|false`
-- Behoben: der benutzername bei lokalem chat war immer der eigene
-- Hinzugefügt: Einstellung für den `botChatChannelName`
+- changed: override of avatar_url is now  optional, can be changed in settings file with `overrideAvatar=true|false`
+- fixed: local chat always displayed your own name
+- added: settings for `botChatChannelName`
 
 ### Version 0.10.2
-- Neuer Discord Befehl: `!version` Zeigt die aktuelle Plugin Version an
-- Neuer Discord Befehl: `/kick` um Spieler zu kicken
-- Neuer Discord Befehl: `/ban` um Spieler zu bannen
-- Neuer Discord Befehl: `/group` um Spieler einer Gruppe zuzuweisen
-- Neuer Discord Befehl: `/bc` für hervorgehobene Nachrichten an alle online-spieler
-- Neuer Discord Befehl: `/yell` für hervorgehobene Nachrichten an alle online-spieler
-- **Für korrekte Syntax bitte !help verwenden**
-- Behoben: properties Dateien wurden nicht korrekt mit UTF8 geladen
-- Neu: i18n Klasse zum übersetzen (Standard: en) kann in settings über `botLang=` geändert werden. Funktioniert aktuell nur bei !help, wird in weiteren Versionen weiter ausgebaut. Auch aktuell nur `de` oder `en` möglich
+- New Discord command: `!version` shows current plugin version
+- New Discord command: `/kick` to kick a player
+- New Discord command: `/ban` to ban a player
+- New Discord command: `/group` to change player group
+- New Discord command: `/bc` to broadcast a message to all player
+- New Discord command: `/yell` to yell a message to all player
+- **TYPE !help for correct syntax of new commands**
+- fixed: properties files were not correctly loaded with UTF8
+- New: i18n class for translation (default: en) can be changed in settings with `botLang=`. Currently only works with `!help`, will be expanded in further updates. Currently only `de` and `en` are available (translators for other languages are welcome!)
 
 ### Version 0.10.1
-- Behoben: Ingame Chat Nachricht wurde doppelt angezeigt
-- Hinzugefügt: `avatar_url` zur webhook message
-- Geändert: JavaCord in eigene Klasse verschoben
-- Behoben: JavaCord listener wird beim shutdown correct entfernt
-- Behoben: der automatische update prozess war immer noch kaputt, geht jetzt wieder
+- Fixed: Ingame chat message was displayed twice
+- added: `avatar_url` to webhook message
+- changed: moved JavaCord to its own class
+- fixed: JavaCord listener will now be correctly removed on plugin disable (shutdown)
+- fixed: automatic update (restart) was still broken, should work now - finally
 
 ### Version 0.10.0
-- Neu: Lokaler Chat hat jetzt das Präfix `[LOCAL]`
-- Neu: Wenn der Discord-Bot in einem Discord Kanal `server-chat` Mitglied ist, sendet er text der kein Befeh ist ins Spiel
-- Neu: 3 verschiedene Farben für `[LOCAL]`
-  - Für Text von anderen
-  - Für Text aus Discord
-  - Für Text den man selber geschrieben hat
+- New: local chat has now a prefix `[LOCAL]`
+- New: It the Discord-Bot is member of a Discord channel named `server-chat`, it will send all messages that are not commands to the ingame chat
+- New: 3 different prefix colors for `[LOCAL]`
+  - chat from other (ingame) player
+  - chat from discord
+  - your own chat messages
 
 ### Version 0.9.2
-- Geändert: nur Befehle die mit / beginnen sind als "sicher" markiert, Befehle die mit ! beginnen kann jeder ausführen.
-- Behoben: GlobalIntercom Meldungen werden nicht mehr als chat über den WebHook gesendet wenn GlobalIntercom installiert ist.
-- **WICHTIG: Wenn GlobalIntercom installiert ist, dann muss die Version >= 0.7.2 sein**
+- Changed: Only commands starting with / are secure, all commands starting with ! can now executed by everyone else
+- Fixed: GlobalIntercom Messages will now filtered and not send to Discord through the webhook
+- **IMPORTANT: If GlobalIntercom is installed, the version must be >= 0.7.2 in order to work**
 
 ### Version 0.9.1
-- Neuer Discord Befehl: `/restart` setzt das restart flag falls Spieler online sind oder macht einen shutdown falls nicht.
-- Neuer Discord Befehl: `!online` Zeigt eine Liste mit Spielern die online sind
-- Neuer Discord Befehl: `!help` Zeigt eine Liste mit Kommandos die über Discord verfügbar sind
-- Behoben: Plugin update Überwachung war fehlerhaft
+- New Discord command: `/restart` set restart flag if there is atleast one player online, shutdown server if not
+- New Discord command: `!online` prints a list of players currently online
+- New Discord command: `!help` prints a list of commands available in discord
+- Fixed: Plugin update watcher was broken
+
 
 ### Version 0.9.0
-- Neu: JavaCord integriert. Jetzt kann optional ein DiscordBot token hinterlegt werden. Über diesen kann man dann Befehle von Discord an den Server senden (in dieser Version nur /support)
-- Neu: Discord Befehl `/support SPIELERNAME TEXT...` um einem Spieler auf dem Server zu schreiben
-- Neue Einstellung: `botEnable` aktiviert den DiscordBot wenn true (standard ist false)
-- Neue Einstellung: `botSecure` nur der Besitzer des Bots kann Befehle ausführen wenn true (standard)
-- Neue Einstellung: `botToken` der Token des Bots
+- New: JavaCord integrated. Now it is possible to activate a discord bot to send commands from discord to your server (for now only /support)
+- New: Discord command `/support PLAYERNAME TEXT...` to send a (support) message to a player
+- New settings: `botEnable` enables the DiscordBot if true (default is false)
+- New settings: `botSecure` only the Bot Owner can send commands if true (default)
+- New settings: `botToken` the bot token
 
 ### Version 0.8.3
-- Project konvertiert zu Maven. Jetzt kann es auch in vscode weiterentwickelt werden!
+- Project converted to Maven, now it can be build in vscode!
 
 ### Version 0.8.2
-- Schlechschreibfehler
+- typos...
 
 ### Version 0.8.1
-- History und Readme gibts jetzt auch auf englisch
-- Fix: chat Nachrichten die mit # beginnen werden nicht in discord geschrieben (OZGI plugin)
+- english translation for readme and history
+- Fix: chat messages that begin with # are not send to discord (See my other Plugin Global Intercom)
 
 ### Version 0.8.0
-- Neu: Spieler können jetzt mit /joinDiscord dem Discord des Servers beitreten sofern es konfiguriert wurde
+- New: players can use /joinDiscord if it is configured
 
 ### Version 0.7.1:
-- Projekt bereinigt für Github
+- Project cleaned up for Github
 
 ### Version 0.7.0:
-- Neu: Automatisches erkennen von neuen settings und neu einlesen dieser ohne Server-Neustart durchführen zu müssen.
-- Neu: Automatisches erkennen von neuen Jar files (in der Regel plugin update) und optional automatischer server shutdown (restart)
+- Neu: Autodetection of new settings.properties and reload without server restart
+- New: Autodetection of new jar files with optional auto-shutdown after last player has left the server
 
 ### Version 0.6.0:
-- Neu: Server restart flag kann jetzt optional von Spielern mit einer mindest-spiel-zeit (auch einstellbar) aktiviert werden
-- Fix: ​Support tickets enthalten jetzt Welt-Koordinaten inclusive dem teleport Befehl zu diesen Koordinaten. Nützlich damit Spieler Fehler in der Welt reporten können und man als Admin direkt zu den gemeldeten Koordinaten springen kann.
+- New: Server restart flag can now set by players after they have played a total time of 1 day on the server (can be configured or turned off)
+- Fix: ​Support tickets now include world coordinates with a teleport command to this location. Useful if players report bugs.
 
 ### Version 0.5.0:
-- Fix: nachrichten mit umlauten können jetzt gesendet werden, codierung wurde auf UTF8 korrigiert
-- Neu: mit /ozrestart kann ein Admin ein restart flag setzen, es lässt den server herunter fahren, sobald der letzte Spieler den Server verlassen hat. ACHTUNG: nur benutzen wenn ihr auch ein automatisches startscript nutzt!
+- Fix: Messages with utf8 characters can now be send (was not correctly sent as utf8)
+- New: with `/ozrestart` an Admin can set a restart flag that will shutdown the server as soon as the last player left the server.
+WARNING: only use this if your server comes back automatically
 
 ### Version 0.4.0:
-- Für jeden Kanal (Chat,Status,Support) kann jetzt ein eigener webHook hinterlegt werden
-- für den Status Kanal lässt sich der Username in den Settings ändern
-- Optional kann automatisch der Servername als Username für Statusmeldungen benutzt werden (Begrenzt auf 32 Zeichen und ohne folgende Zeichen: @#:`)
+- For each channel (Chat,Status,Support) you can now configure a different webHook if you like
+- You can now change the username of the status messages
+- Additional the servername can be used automatically for messages to the status webHook (Player names have a limit of 32 chars and must not have any of @#:`)
 
 ### Version 0.3.0:
-- Nachricht des Tages / motd kann in den settings eingestellt / (de)aktiviert werden und wird beim Spawn an den Spieler gesendet (um z.b. auf den Discord Server hinzuweisen)
-- ein zweiter webHook kann konfiguriert werden für support tickets die per `/support [text]` abgesendet werden. Der Spieler erhält die Meldung das die Nachricht an Discord verschickt wurde
+- New: You can configure a MOTD if you like to show a message if a player logs in (fo example info about this plugin)
+- New: a second webHook can be configured for support tickets send by `/support [text]`, the player receives a message that his text was send to Disorc
 
 ### Version 0.2.0:
-- Neu: Zeigt nun auch logins und logouts an
-- Neu: Anzeige von chat / logins kann über settings.properties konfiguriert werden
+- New: shows now logins and logouts
+- New: visibility of chat or logins can be configured in settings.properties
 
 ### Version 0.1.0:
-- Initiales Plugin nur chat wird gepostet
+- initial Plugin, only chat is posted
