@@ -75,7 +75,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "0.15.0";
+	static final String pluginVersion = "0.15.1";
 	static final String pluginName = "DiscordPlugin";
 	static final String pluginCMD = "dp";
 
@@ -222,13 +222,10 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			this.sendDiscordMessage(username, statusEnabledMessage, webHookStatusUrl);
 		}
 		try {
-
-			PluginChangeWatcher WU = new PluginChangeWatcher(this);
 			File f = new File(getPath());
-			WU.watchDir(f);
-			WU.startListening();
-		} catch (IOException ex) {
-			log.out(ex.getMessage(), 999);
+			PluginChangeWatcher.registerFileChangeListener(this, f);
+		} catch (Exception ex) {
+			log.out(ex.toString(), 911);
 		}
 
 		if (!botEnable) {
@@ -370,7 +367,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	public void onPlayerChat(PlayerChatEvent event) {
 
 		String message = event.getChatMessage();
-		String noColorText = message.replaceFirst("(\\[#[0-9a-fA-F]+\\])", "");
+		String noColorText = message.replaceAll("(\\[#[0-9a-fA-F]+\\])", "");
 		Boolean processMessage = postChat;
 
 		if (!processMessage) {

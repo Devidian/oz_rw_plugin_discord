@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.15.1] - 2019-12-10
+### Fixed
+- updated dependencies
+
 ## [0.15.0] - 2019-05-10
 ### Added
 - DiscordBot now send reaction if command was executed successfully

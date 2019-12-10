@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.15.1] - 2019-12-10
+### Fixed
+- Abhängigkeiten aktualisiert
+
 ## [0.15.0] - 2019-05-10
 ### Added
 - Der Bot sollte jetzt auf ein Kommando eine reaction abgeben
@@ -37,7 +41,7 @@
 ### Fixed
 - Exception bei Eingabe von `/dp` ohne parameter
 - JavaCordBot entfernt jetzt alle listener bei einem disconnect
-- Der Reguläre Ausdruck für `noColorText` kannte keine Zahlen 
+- Der Reguläre Ausdruck für `noColorText` kannte keine Zahlen
 ### Changed
 - Alle *.md files sind nun standardmäßig in englisch
 - Abfragebefehle fangen jetzt mit `?` statt `!` an. Siehe `?help` in Discord oder README

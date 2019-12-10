@@ -16,7 +16,7 @@ import org.javacord.api.listener.message.MessageCreateListener;
 import de.omegazirkel.risingworld.tools.Colors;
 import de.omegazirkel.risingworld.tools.I18n;
 import net.risingworld.api.Server;
-import net.risingworld.api.database.Database;
+// import net.risingworld.api.database.Database;
 import net.risingworld.api.database.WorldDatabase;
 import net.risingworld.api.objects.Player;
 import net.risingworld.api.objects.Weather;
@@ -37,7 +37,8 @@ public class JavaCordBot implements Runnable {
 
     public JavaCordBot(final DiscordWebHook plugin) {
         pluginInstance = plugin;
-        t = new I18n(plugin);
+		t = new I18n(plugin);
+		Thread.currentThread().setName("DP.JavaCordBot");
     }
 
     public void disconnect() {
@@ -448,7 +449,7 @@ public class JavaCordBot implements Runnable {
         };
         api.addMessageCreateListener(messageCreateListener);
         api.addLostConnectionListener(event -> {
-            log.out("Lost connection to Discord", 999);
+            log.out("Lost connection to Discord", 911);
         });
         api.addReconnectListener(event -> {
             log.out("Reconnect", 100);
