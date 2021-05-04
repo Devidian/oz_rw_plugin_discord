@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [0.15.3] - 2021-05-04
+### Changed
+- seperated Commands with new dependency `sdcf4j`
+- moved discord message listener to own file and only reacts to chat now
+
+## [0.15.2] - 2021-05-03
+### Fixed
+- updated dependencies
+
 ## [0.15.1] - 2019-12-10
 ### Fixed
 - updated dependencies

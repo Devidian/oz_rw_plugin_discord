@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [0.15.3] - 2021-05-04
+### Changed
+- Bot Befehle in eigene Klassen separiert mit Hilfe von `sdcf4j`
+- Discord message Listener wurde in eigene Datei verschoben und reagiert nur noch auf chat
+
+## [0.15.2] - 2021-05-03
+### Fixed
+- Abhängigkeiten aktualisiert
+
 ## [0.15.1] - 2019-12-10
 ### Fixed
 - Abhängigkeiten aktualisiert

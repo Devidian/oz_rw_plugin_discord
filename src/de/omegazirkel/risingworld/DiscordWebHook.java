@@ -75,8 +75,8 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-	static final String pluginVersion = "0.15.1";
-	static final String pluginName = "DiscordPlugin";
+	public static final String pluginVersion = "0.15.3";
+	public static final String pluginName = "DiscordPlugin";
 	static final String pluginCMD = "dp";
 
 	static final de.omegazirkel.risingworld.tools.Logger log = new de.omegazirkel.risingworld.tools.Logger("[OZ.DP]");
@@ -203,6 +203,10 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 		return showGroup;
 	}
 
+	public I18n getTranslator() {
+		return t;
+	}
+
 	@Override
 	public void onEnable() {
 		// Register event listener
@@ -232,8 +236,14 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			log.out("DiscordBot is disabled", 0);
 			return;
 		}
-		DiscordBot = new JavaCordBot(this);
-		DiscordBot.run();
+
+		try {
+			DiscordBot = new JavaCordBot(this);
+			DiscordBot.run();
+		} catch (Exception ex) {
+			log.out(ex.toString(), 911);
+		}
+
 		log.out(pluginName + " Plugin is enabled", 10);
 	}
 
@@ -259,50 +269,51 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			String option = cmdParts[1];
 
 			switch (option) {
-			case "restart":
-				boolean canTriggerRestart = allowRestart && (player.isAdmin() || (!restartAdminOnly
-						&& player.getTotalPlayTime() > restartMinimumTime && restartMinimumTime > 0));
-				if (canTriggerRestart) {
-					String username = statusUsername;
-					if (useServerName) {
-						Server server = getServer();
-						username = server.getName();
+				case "restart":
+					boolean canTriggerRestart = allowRestart && (player.isAdmin() || (!restartAdminOnly
+							&& player.getTotalPlayTime() > restartMinimumTime && restartMinimumTime > 0));
+					if (canTriggerRestart) {
+						String username = statusUsername;
+						if (useServerName) {
+							Server server = getServer();
+							username = server.getName();
+						}
+						String msgDC = t.get("DC_SHUTDOWN", botLang).replace("PH_PLAYER", player.getName());
+						this.sendDiscordMessage(username, msgDC, webHookStatusUrl);
+						this.broadcastMessage("BC_SHUTDOWN", player.getName());
+						flagRestart = true;
+					} else {
+						player.sendTextMessage(
+								c.error + pluginName + ":>" + c.text + t.get("CMD_RESTART_NOTALLOWED", lang));
 					}
-					String msgDC = t.get("DC_SHUTDOWN", botLang).replace("PH_PLAYER", player.getName());
-					this.sendDiscordMessage(username, msgDC, webHookStatusUrl);
-					this.broadcastMessage("BC_SHUTDOWN", player.getName());
-					flagRestart = true;
-				} else {
-					player.sendTextMessage(
-							c.error + pluginName + ":>" + c.text + t.get("CMD_RESTART_NOTALLOWED", lang));
-				}
-				break;
-			case "info":
-				String infoMessage = t.get("CMD_INFO", lang)
-						.replace("PH_CMD_SUPPORT", c.command + "/support TEXT" + c.text)
-						.replace("PH_CMD_HELP", c.command + "/" + pluginCMD + " help" + c.text);
-				player.sendTextMessage(c.okay + pluginName + ":> " + c.text + infoMessage);
-				break;
-			case "help":
-				String helpMessage = t.get("CMD_HELP", lang)
-						.replace("PH_CMD_SUPPORT", c.command + "/support TEXT" + c.text)
-						.replace("PH_CMD_HELP", c.command + "/" + pluginCMD + " help" + c.text)
-						.replace("PH_CMD_RESTART", c.command + "/" + pluginCMD + " restart" + c.text)
-						.replace("PH_CMD_INFO", c.command + "/" + pluginCMD + " info" + c.text)
-						.replace("PH_CMD_STATUS", c.command + "/" + pluginCMD + " status" + c.text)
-						.replace("PH_CMD_JOIN", c.command + "/joinDiscord" + c.text);
-				player.sendTextMessage(c.okay + pluginName + ":> " + c.text + helpMessage);
-				break;
-			case "status":
-				String statusMessage = t.get("CMD_STATUS", lang).replace("PH_VERSION", c.okay + pluginVersion + c.text)
-						.replace("PH_LANGUAGE",
-								colorLocalSelf + player.getLanguage() + " / " + player.getSystemLanguage() + c.text)
-						.replace("PH_USEDLANG", colorLocalOther + t.getLanguageUsed(lang) + c.text)
-						.replace("PH_LANG_AVAILABLE", c.okay + t.getLanguageAvailable() + c.text);
-				player.sendTextMessage(c.okay + pluginName + ":> " + c.text + statusMessage);
-				break;
-			default:
-				break;
+					break;
+				case "info":
+					String infoMessage = t.get("CMD_INFO", lang)
+							.replace("PH_CMD_SUPPORT", c.command + "/support TEXT" + c.text)
+							.replace("PH_CMD_HELP", c.command + "/" + pluginCMD + " help" + c.text);
+					player.sendTextMessage(c.okay + pluginName + ":> " + c.text + infoMessage);
+					break;
+				case "help":
+					String helpMessage = t.get("CMD_HELP", lang)
+							.replace("PH_CMD_SUPPORT", c.command + "/support TEXT" + c.text)
+							.replace("PH_CMD_HELP", c.command + "/" + pluginCMD + " help" + c.text)
+							.replace("PH_CMD_RESTART", c.command + "/" + pluginCMD + " restart" + c.text)
+							.replace("PH_CMD_INFO", c.command + "/" + pluginCMD + " info" + c.text)
+							.replace("PH_CMD_STATUS", c.command + "/" + pluginCMD + " status" + c.text)
+							.replace("PH_CMD_JOIN", c.command + "/joinDiscord" + c.text);
+					player.sendTextMessage(c.okay + pluginName + ":> " + c.text + helpMessage);
+					break;
+				case "status":
+					String statusMessage = t.get("CMD_STATUS", lang)
+							.replace("PH_VERSION", c.okay + pluginVersion + c.text)
+							.replace("PH_LANGUAGE",
+									colorLocalSelf + player.getLanguage() + " / " + player.getSystemLanguage() + c.text)
+							.replace("PH_USEDLANG", colorLocalOther + t.getLanguageUsed(lang) + c.text)
+							.replace("PH_LANG_AVAILABLE", c.okay + t.getLanguageAvailable() + c.text);
+					player.sendTextMessage(c.okay + pluginName + ":> " + c.text + statusMessage);
+					break;
+				default:
+					break;
 			}
 
 		} else if (command.equals("/support")) {
