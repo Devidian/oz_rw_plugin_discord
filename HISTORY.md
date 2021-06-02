@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.15.6] - 2021-06-02
+### Fixed
+- `restart` command had wrong text ingame
+
 ## [0.15.5] - 2021-05-16
 ### Fixed
 - the new `command` parameter killed class `command` property

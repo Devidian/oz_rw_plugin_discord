@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.15.6] - 2021-06-02
+### Fixed
+- `restart` command hat falschen Text im Spiel angezeigt
+
 ## [0.15.5] - 2021-05-16
 ### Fixed
 - der neue `command` parameter hat die klassen-Eigenschaft `command` überschrieben

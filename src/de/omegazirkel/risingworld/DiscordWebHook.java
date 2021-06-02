@@ -75,7 +75,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-	public static final String pluginVersion = "0.15.5";
+	public static final String pluginVersion = "0.15.6";
 	public static final String pluginName = "DiscordPlugin";
 	static final String pluginCMD = "dp";
 

@@ -40,7 +40,7 @@ public class RestartCommand implements CommandExecutor {
             server.getAllPlayers().forEach((p) -> {
                 String l = p.getSystemLanguage();
                 p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>" + c.text
-                        + t.get("BC_GROUP", l).replace("PH_DISCORDUSER", author.getDiscriminatedName()));
+                        + t.get("BC_RESTART", l).replace("PH_DISCORDUSER", author.getDiscriminatedName()));
             });
             plugin.setFlagRestart(true);
             message.addReaction("✔");
