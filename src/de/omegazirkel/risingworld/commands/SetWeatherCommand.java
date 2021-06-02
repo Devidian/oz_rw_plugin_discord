@@ -16,14 +16,16 @@ import net.risingworld.api.objects.Weather;
 public class SetWeatherCommand implements CommandExecutor {
 
     static final String command = "setweather";
+    static final String fullCommand = "/" + command;
     static final String description = "tbd";
 
     static final de.omegazirkel.risingworld.tools.Logger log = new de.omegazirkel.risingworld.tools.Logger(
             "[OZ.DP] [JavaCordBot.Commands.SetWeatherCommand]");
 
-    @Command(aliases = { "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "/setweather [weather]", showInHelpPage = true)
-    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String weather) {
+    @Command(aliases = {
+            fullCommand }, description = description, async = true, privateMessages = false, usage = "/setweather [weather]", showInHelpPage = true)
+    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
+            String weather) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();
@@ -45,9 +47,8 @@ public class SetWeatherCommand implements CommandExecutor {
             for (Weather w : Weather.values()) {
                 sb.append(w.toString() + "\n");
             }
-            return t.get("CMD_ERR_ILLEGAL_ARGUMENTS", lang)
-            .replace("PH_CMD", "/setweather [Weather]").replace("PH_ARGUMENT", "Weather")
-            .replace("PH_ARGS_AVAILABLE", sb.toString());
+            return t.get("CMD_ERR_ILLEGAL_ARGUMENTS", lang).replace("PH_CMD", "/setweather [Weather]")
+                    .replace("PH_ARGUMENT", "Weather").replace("PH_ARGS_AVAILABLE", sb.toString());
         } catch (NullPointerException e) {
             log.out(e.getMessage());
             message.addReaction("👎");

@@ -15,11 +15,13 @@ import net.risingworld.api.Server;
 public class YellCommand implements CommandExecutor {
 
     static final String command = "yell";
+    static final String fullCommand = "/" + command;
     static final String description = "tbd";
 
-    @Command(aliases = { "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "/yell [text]", showInHelpPage = true)
-    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String content) {
+    @Command(aliases = {
+            fullCommand }, description = description, async = true, privateMessages = false, usage = "/yell [text]", showInHelpPage = true)
+    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
+            String content) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();

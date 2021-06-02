@@ -18,10 +18,12 @@ import net.risingworld.api.objects.Player;
 public class OnlineCommand implements CommandExecutor {
 
     static final String command = "online";
+    static final String fullCommand = "/" + command;
+    static final String altCommand = "?" + command;
     static final String description = "tbd";
 
-    @Command(aliases = { "?"
-            + command }, description = description, async = true, privateMessages = false, usage = "?online", showInHelpPage = true)
+    @Command(aliases = { altCommand,
+            fullCommand }, description = description, async = true, privateMessages = false, usage = "?online", showInHelpPage = true)
     public String onCommand(TextChannel channel, Message message) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();

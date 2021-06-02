@@ -14,10 +14,11 @@ import net.risingworld.api.objects.Time.Unit;
 public class GetTimeCommand implements CommandExecutor {
 
     static final String command = "time";
+    static final String fullCommand = "/" + command;
+    static final String altCommand = "?" + command;
     static final String description = "tbd";
 
-    @Command(aliases = { "?" + command, "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "?time", showInHelpPage = true)
+    @Command(aliases = { altCommand, fullCommand }, description = description, async = true, privateMessages = false, usage = "?time", showInHelpPage = true)
     public String onCommand(TextChannel channel, Message message) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();

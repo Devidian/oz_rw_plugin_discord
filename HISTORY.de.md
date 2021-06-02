@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [0.15.5] - 2021-05-16
+### Fixed
+- der neue `command` parameter hat die klassen-Eigenschaft `command` überschrieben
+
+## [0.15.4] - 2021-05-15
+### Fixed
+- discord Befehle haben als ersten parameter den Befehl selbst übergeben.
+
 ## [0.15.3] - 2021-05-04
 ### Changed
 - Bot Befehle in eigene Klassen separiert mit Hilfe von `sdcf4j`

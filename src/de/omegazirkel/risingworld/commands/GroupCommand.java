@@ -17,12 +17,13 @@ import net.risingworld.api.objects.Player;
 public class GroupCommand implements CommandExecutor {
 
     static final String command = "group";
+    static final String fullCommand = "/" + command;
     static final String description = "tbd";
     static final Colors c = Colors.getInstance();
 
-    @Command(aliases = { "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "/group [playername] [groupname]", showInHelpPage = true)
-    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String playerName, String groupName) {
+    @Command(aliases = { fullCommand }, description = description, async = true, privateMessages = false, usage = "/group [playername] [groupname]", showInHelpPage = true)
+    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
+            String playerName, String groupName) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();
@@ -51,7 +52,6 @@ public class GroupCommand implements CommandExecutor {
         });
         message.addReaction("✔");
 
-        return t.get("CMD_OUT_GROUP", lang).replace("PH_PLAYER", playerName)
-        .replace("PH_GROUP", groupName);
+        return t.get("CMD_OUT_GROUP", lang).replace("PH_PLAYER", playerName).replace("PH_GROUP", groupName);
     }
 }

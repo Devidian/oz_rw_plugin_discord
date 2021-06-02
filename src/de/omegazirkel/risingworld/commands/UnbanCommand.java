@@ -15,11 +15,12 @@ import net.risingworld.api.Server;
 public class UnbanCommand implements CommandExecutor {
 
     static final String command = "unban";
+    static final String fullCommand = "/" + command;
     static final String description = "tbd";
 
-    @Command(aliases = { "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "/unban [uid]", showInHelpPage = true)
-    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String uidRaw) {
+    @Command(aliases = {
+            fullCommand }, description = description, async = true, privateMessages = false, usage = "/unban [uid]", showInHelpPage = true)
+    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd, String uidRaw) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();

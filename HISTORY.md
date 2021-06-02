@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+## [0.15.5] - 2021-05-16
+### Fixed
+- the new `command` parameter killed class `command` property
+
+## [0.15.4] - 2021-05-15
+### Fixed
+- discord commands have had the command as first String parameter
+
 ## [0.15.3] - 2021-05-04
 ### Changed
 - seperated Commands with new dependency `sdcf4j`

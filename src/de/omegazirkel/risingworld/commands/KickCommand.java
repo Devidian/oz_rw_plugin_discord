@@ -17,13 +17,13 @@ import net.risingworld.api.objects.Player;
 public class KickCommand implements CommandExecutor {
 
     static final String command = "kick";
+    static final String fullCommand = "/" + command;
     static final String description = "tbd";
     static final Colors c = Colors.getInstance();
 
-    @Command(aliases = { "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "/kick [playername] [reason?]", showInHelpPage = true)
-    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String playerName,
-            String reason) {
+    @Command(aliases = { fullCommand }, description = description, async = true, privateMessages = false, usage = "/kick [playername] [reason?]", showInHelpPage = true)
+    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
+            String playerName, String reason) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();

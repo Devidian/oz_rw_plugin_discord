@@ -13,10 +13,11 @@ import net.risingworld.api.Server;
 public class GetWeatherCommand implements CommandExecutor {
 
     static final String command = "weather";
+    static final String fullCommand = "/" + command;
+    static final String altCommand = "?" + command;
     static final String description = "tbd";
 
-    @Command(aliases = { "?" + command, "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "?weather", showInHelpPage = true)
+    @Command(aliases = { altCommand, fullCommand }, description = description, async = true, privateMessages = false, usage = "?weather", showInHelpPage = true)
     public String onCommand(TextChannel channel, Message message) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();

@@ -16,11 +16,13 @@ import net.risingworld.api.objects.Player;
 public class TeleportToPlayerCommand implements CommandExecutor {
 
     static final String command = "tptp";
+    static final String fullCommand = "/" + command;
     static final String description = "tbd";
 
-    @Command(aliases = { "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "/tptp [playerName] [playerName]", showInHelpPage = true)
-    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String playerNameA, String playerNameB) {
+    @Command(aliases = {
+            fullCommand }, description = description, async = true, privateMessages = false, usage = "/tptp [playerName] [playerName]", showInHelpPage = true)
+    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
+            String playerNameA, String playerNameB) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();

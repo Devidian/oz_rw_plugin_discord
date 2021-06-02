@@ -11,10 +11,11 @@ import de.omegazirkel.risingworld.guards.RisingWorldCommandGuard;
 public class GetVersionCommand implements CommandExecutor {
 
     static final String command = "version";
+    static final String fullCommand = "/" + command;
+    static final String altCommand = "?" + command;
     static final String description = "tbd";
 
-    @Command(aliases = { "?" + command, "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "?version", showInHelpPage = true)
+    @Command(aliases = { altCommand, fullCommand }, description = description, async = true, privateMessages = false, usage = "?version", showInHelpPage = true)
     public String onCommand(TextChannel channel, Message message) {
 
         if (!RisingWorldCommandGuard.canUseCommand(command, message)) {

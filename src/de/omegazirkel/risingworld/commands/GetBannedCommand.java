@@ -19,13 +19,15 @@ import net.risingworld.api.database.WorldDatabase;
 public class GetBannedCommand implements CommandExecutor {
 
     static final String command = "banned";
+    static final String fullCommand = "/" + command;
+    static final String altCommand = "?" + command;
     static final String description = "tbd";
 
     static final de.omegazirkel.risingworld.tools.Logger log = new de.omegazirkel.risingworld.tools.Logger(
             "[OZ.DP] [JavaCordBot.Commands.GetBannedCommand]");
 
-    @Command(aliases = { "?" + command, "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "?banned", showInHelpPage = true)
+    @Command(aliases = { altCommand,
+            fullCommand }, description = description, async = true, privateMessages = false, usage = "?banned", showInHelpPage = true)
     public String onCommand(TextChannel channel, Message message) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         String lang = plugin.getBotLanguage();

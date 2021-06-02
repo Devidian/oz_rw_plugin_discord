@@ -16,11 +16,12 @@ import net.risingworld.api.Server;
 public class RestartCommand implements CommandExecutor {
 
     static final String command = "restart";
+    static final String fullCommand = "/" + command;
     static final String description = "tbd";
     static final Colors c = Colors.getInstance();
 
-    @Command(aliases = { "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "/restart", showInHelpPage = true)
+    @Command(aliases = {
+            fullCommand }, description = description, async = true, privateMessages = false, usage = "/restart", showInHelpPage = true)
     public String onCommand(TextChannel channel, Message message, MessageAuthor author) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();
@@ -35,7 +36,7 @@ public class RestartCommand implements CommandExecutor {
             server.shutdown();
             return t.get("CMD_OUT_RESTART_NOW", lang);
         } else {
-            
+
             server.getAllPlayers().forEach((p) -> {
                 String l = p.getSystemLanguage();
                 p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>" + c.text

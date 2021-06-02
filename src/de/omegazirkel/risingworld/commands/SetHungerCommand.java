@@ -16,12 +16,13 @@ import net.risingworld.api.objects.Player;
 public class SetHungerCommand implements CommandExecutor {
 
     static final String command = "sethunger";
+    static final String fullCommand = "/" + command;
     static final String description = "tbd";
 
-    @Command(aliases = { "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "/sethunger [playerName] [value=100]", showInHelpPage = true)
-    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String playerName,
-            String valueInt) {
+    @Command(aliases = {
+            fullCommand }, description = description, async = true, privateMessages = false, usage = "/sethunger [playerName] [value=100]", showInHelpPage = true)
+    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
+            String playerName, String valueInt) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();

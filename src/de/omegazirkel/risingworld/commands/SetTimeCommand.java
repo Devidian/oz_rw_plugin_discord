@@ -15,11 +15,12 @@ import net.risingworld.api.Server;
 public class SetTimeCommand implements CommandExecutor {
 
     static final String command = "settime";
+    static final String fullCommand = "/" + command;
     static final String description = "tbd";
 
-    @Command(aliases = { "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "/settime [hour] [minute?]", showInHelpPage = true)
-    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String hourStr,
+    @Command(aliases = {
+            fullCommand }, description = description, async = true, privateMessages = false, usage = "/settime [hour] [minute?]", showInHelpPage = true)
+    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd, String hourStr,
             String minuteStr) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         Server server = plugin.getServer();
@@ -32,7 +33,7 @@ public class SetTimeCommand implements CommandExecutor {
         if (hourStr == null) {
             return t.get("CMD_ERR_ARGUMENT_LENGTH", lang).replace("PH_CMD", "/settime [HOUR] [MINUTE]");
         }
-        
+
         if (minuteStr == null) {
             minuteStr = "0";
         }

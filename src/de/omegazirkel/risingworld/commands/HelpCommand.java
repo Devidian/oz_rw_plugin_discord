@@ -13,10 +13,11 @@ import de.omegazirkel.risingworld.tools.I18n;
 public class HelpCommand implements CommandExecutor {
 
     static final String command = "help";
+    static final String fullCommand = "/" + command;
+    static final String altCommand = "?" + command;
     static final String description = "tbd";
 
-    @Command(aliases = { "?" + command, "/"
-            + command }, description = description, async = true, privateMessages = false, usage = "?help", showInHelpPage = true)
+    @Command(aliases = { altCommand, fullCommand }, description = description, async = true, privateMessages = false, usage = "?help", showInHelpPage = true)
     public String onCommand(TextChannel channel, Message message) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
         String lang = plugin.getBotLanguage();
