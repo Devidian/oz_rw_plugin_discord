@@ -24,7 +24,6 @@ public class SupportCommand implements CommandExecutor {
     public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
             String playerName, String content) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();
         I18n t = plugin.getTranslator();
         if (!RisingWorldCommandGuard.canUseCommand(command, message)) {
@@ -35,7 +34,7 @@ public class SupportCommand implements CommandExecutor {
             return t.get("CMD_ERR_SUPPORT_ARGUMENTS", lang);
         }
 
-        Player player = server.getPlayer(playerName);
+        Player player = Server.getPlayerByName(playerName);
         if (player == null) {
             return t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName);
         }

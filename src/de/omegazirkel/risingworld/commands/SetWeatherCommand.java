@@ -11,7 +11,6 @@ import de.omegazirkel.risingworld.JavaCordBot;
 import de.omegazirkel.risingworld.guards.RisingWorldCommandGuard;
 import de.omegazirkel.risingworld.tools.I18n;
 import net.risingworld.api.Server;
-import net.risingworld.api.objects.Weather;
 
 public class SetWeatherCommand implements CommandExecutor {
 
@@ -27,7 +26,6 @@ public class SetWeatherCommand implements CommandExecutor {
     public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
             String weather) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();
         I18n t = plugin.getTranslator();
         if (!RisingWorldCommandGuard.canUseCommand(command, message)) {
@@ -39,14 +37,14 @@ public class SetWeatherCommand implements CommandExecutor {
         }
 
         try {
-            Weather newWeather = Weather.valueOf(weather);
-            server.setWeather(newWeather, false);
+            // FIXME weather set broken
+            Server.setWeather(null, false);
             message.addReaction("✔");
         } catch (IllegalArgumentException e) {
             StringBuilder sb = new StringBuilder();
-            for (Weather w : Weather.values()) {
-                sb.append(w.toString() + "\n");
-            }
+            // for (WeatherDefs w : Weather.??) {
+                // sb.append(w.toString() + "\n");
+            // }
             return t.get("CMD_ERR_ILLEGAL_ARGUMENTS", lang).replace("PH_CMD", "/setweather [Weather]")
                     .replace("PH_ARGUMENT", "Weather").replace("PH_ARGS_AVAILABLE", sb.toString());
         } catch (NullPointerException e) {

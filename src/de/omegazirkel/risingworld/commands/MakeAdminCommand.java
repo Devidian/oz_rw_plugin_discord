@@ -23,7 +23,6 @@ public class MakeAdminCommand implements CommandExecutor {
     public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
             String playerName) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();
         I18n t = plugin.getTranslator();
         if (!RisingWorldCommandGuard.canUseCommand(command, message)) {
@@ -34,7 +33,7 @@ public class MakeAdminCommand implements CommandExecutor {
             return t.get("CMD_ERR_ARGUMENT_LENGTH", lang).replace("PH_CMD", "/mkadmin [PLAYER]");
         }
 
-        Player player = server.getPlayer(playerName);
+        Player player = Server.getPlayerByName(playerName);
 
         if (player == null) {
             return t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName);

@@ -26,7 +26,7 @@ public class OnlineCommand implements CommandExecutor {
             fullCommand }, description = description, async = true, privateMessages = false, usage = "?online", showInHelpPage = true)
     public String onCommand(TextChannel channel, Message message) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        Server server = plugin.getServer();
+
         String lang = plugin.getBotLanguage();
         I18n t = plugin.getTranslator();
 
@@ -34,7 +34,7 @@ public class OnlineCommand implements CommandExecutor {
             return null;
         }
 
-        int playersOnline = server.getPlayerCount();
+        int playersOnline = Server.getPlayerCount();
         if (playersOnline == 0) {
             return t.get("CMD_OUT_ONLINE_NOBODY", lang);
         }
@@ -42,9 +42,9 @@ public class OnlineCommand implements CommandExecutor {
         List<String> list = Arrays.asList(t.get("CMD_OUT_ONLINE_LIST", lang) + "\n");
         StringBuilder sb = new StringBuilder();
         list.forEach(sb::append);
-        server.getAllPlayers().forEach((Player p) -> {
+        for (Player p : Server.getAllPlayers()) {
             sb.append(p.getName() + "\n");
-        });
+        }
         return sb.toString();
     }
 }

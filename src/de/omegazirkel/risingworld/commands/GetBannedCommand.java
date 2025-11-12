@@ -15,6 +15,7 @@ import de.omegazirkel.risingworld.JavaCordBot;
 import de.omegazirkel.risingworld.guards.RisingWorldCommandGuard;
 import de.omegazirkel.risingworld.tools.I18n;
 import net.risingworld.api.database.WorldDatabase;
+import net.risingworld.api.database.WorldDatabase.Target;
 
 public class GetBannedCommand implements CommandExecutor {
 
@@ -36,7 +37,7 @@ public class GetBannedCommand implements CommandExecutor {
             return null;
         }
 
-        WorldDatabase db = plugin.getWorldDatabase();
+        WorldDatabase db = plugin.getWorldDatabase(Target.Bans);
         try (ResultSet result = db.executeQuery("SELECT * FROM `Banlist`")) {
             List<String> list = Arrays.asList(t.get("CMD_OUT_BANNED_LIST", lang) + "\n");
             StringBuilder sb = new StringBuilder();

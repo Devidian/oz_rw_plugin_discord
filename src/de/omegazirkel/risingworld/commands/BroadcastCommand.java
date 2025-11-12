@@ -22,7 +22,6 @@ public class BroadcastCommand implements CommandExecutor {
     public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd, String type,
             String content) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();
         I18n t = plugin.getTranslator();
         if (!RisingWorldCommandGuard.canUseCommand(command, message)) {
@@ -37,7 +36,7 @@ public class BroadcastCommand implements CommandExecutor {
         // the message excluding the first 2 parts
         String response = message.getContent().split(" ", 3)[2];
 
-        server.broadcastTextMessage(plugin.getColorSupport() + "[" + type + "] " + author.getDisplayName() + ": "
+        Server.broadcastTextMessage(plugin.getColorSupport() + "[" + type + "] " + author.getDisplayName() + ": "
                 + plugin.getColorText() + response);
         message.addReaction("✔");
 

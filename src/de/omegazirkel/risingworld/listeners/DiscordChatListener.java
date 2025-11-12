@@ -29,7 +29,6 @@ public class DiscordChatListener implements MessageCreateListener {
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
-        Server server = pluginInstance.getServer();
 
         log.out("messageCreateEvent", 0);
         String content = event.getMessageContent();
@@ -57,7 +56,7 @@ public class DiscordChatListener implements MessageCreateListener {
                 color = pluginInstance.getColorLocalAdmin();
                 group = " (discord/admin)";
             }
-            server.broadcastTextMessage(color + "[LOCAL] " + author.getDiscriminatedName() + group + ": "
+            Server.broadcastTextMessage(color + "[LOCAL] " + author.getDiscriminatedName() + group + ": "
                     + pluginInstance.getColorText() + content);
         } else {
             log.out("Unknown message <" + content + "> in channel <" + chName + ">", 0);

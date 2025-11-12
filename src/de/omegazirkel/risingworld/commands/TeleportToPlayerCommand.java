@@ -24,7 +24,6 @@ public class TeleportToPlayerCommand implements CommandExecutor {
     public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
             String playerNameA, String playerNameB) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();
         I18n t = plugin.getTranslator();
         if (!RisingWorldCommandGuard.canUseCommand(command, message)) {
@@ -35,8 +34,8 @@ public class TeleportToPlayerCommand implements CommandExecutor {
             return t.get("CMD_ERR_ARGUMENT_LENGTH", lang).replace("PH_CMD", "/tptp [PLAYERNAME] [PLAYERNAME]");
         }
 
-        Player player = server.getPlayer(playerNameA);
-        Player targetPlayer = server.getPlayer(playerNameB);
+        Player player = Server.getPlayerByName(playerNameA);
+        Player targetPlayer = Server.getPlayerByName(playerNameB);
 
         if (player == null) {
             return t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerNameA);

@@ -23,7 +23,6 @@ public class SetTimeCommand implements CommandExecutor {
     public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd, String hourStr,
             String minuteStr) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();
         I18n t = plugin.getTranslator();
         if (!RisingWorldCommandGuard.canUseCommand(command, message)) {
@@ -41,7 +40,7 @@ public class SetTimeCommand implements CommandExecutor {
         try {
             int hour = Integer.parseInt(hourStr);
             int minute = Integer.parseInt(minuteStr);
-            server.setGameTime(hour, minute);
+            Server.setGameTime(hour, minute);
             message.addReaction("✔");
         } catch (Exception e) {
             message.addReaction("👎");

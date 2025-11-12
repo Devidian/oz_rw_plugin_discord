@@ -21,11 +21,12 @@ public class KickCommand implements CommandExecutor {
     static final String description = "tbd";
     static final Colors c = Colors.getInstance();
 
-    @Command(aliases = { fullCommand }, description = description, async = true, privateMessages = false, usage = "/kick [playername] [reason?]", showInHelpPage = true)
+    @Command(aliases = {
+            fullCommand }, description = description, async = true, privateMessages = false, usage = "/kick [playername] [reason?]", showInHelpPage = true)
     public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
             String playerName, String reason) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        Server server = plugin.getServer();
+
         String lang = plugin.getBotLanguage();
         I18n t = plugin.getTranslator();
         if (!RisingWorldCommandGuard.canUseCommand(command, message)) {
@@ -36,19 +37,20 @@ public class KickCommand implements CommandExecutor {
             return t.get("CMD_ERR_KICK_ARGUMENTS", lang);
         }
 
-        Player player = server.getPlayer(playerName);
+        Player player = Server.getPlayerByName(playerName);
 
         if (player == null) {
             return t.get("CMD_ERR_PLAYER_OFFLINE", lang).replace("PH_PLAYER", playerName);
         }
 
         player.kick(reason);
-        server.getAllPlayers().forEach((p) -> {
+        for (Player p : Server.getAllPlayers()) {
+
             String l = p.getSystemLanguage();
             p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>" + c.text
                     + t.get("BC_KICKED", l).replace("PH_PLAYER", playerName)
                             .replace("PH_DISCORDUSER", author.getDiscriminatedName()).replace("PH_REASON", reason));
-        });
+        }
         message.addReaction("✔");
 
         return "Player " + playerName + " kicked!";

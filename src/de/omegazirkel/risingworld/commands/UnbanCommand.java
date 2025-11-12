@@ -19,22 +19,20 @@ public class UnbanCommand implements CommandExecutor {
     static final String description = "tbd";
 
     @Command(aliases = {
-            fullCommand }, description = description, async = true, privateMessages = false, usage = "/unban [uid]", showInHelpPage = true)
-    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd, String uidRaw) {
+            fullCommand }, description = description, async = true, privateMessages = false, usage = "/unban [name]", showInHelpPage = true)
+    public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd, String playerName) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();
         I18n t = plugin.getTranslator();
         if (!RisingWorldCommandGuard.canUseCommand(command, message)) {
             return null;
         }
 
-        if (uidRaw == null) {
-            return t.get("CMD_ERR_ARGUMENT_LENGTH", lang).replace("PH_CMD", "/unban [UID]");
+        if (playerName == null) {
+            return t.get("CMD_ERR_ARGUMENT_LENGTH", lang).replace("PH_CMD", "/unban [name]");
         }
         try {
-            long uid = Long.parseLong(uidRaw);
-            server.unbanPlayer(uid);
+            Server.unbanPlayer(playerName);
             message.addReaction("✔");
         } catch (Exception e) {
             message.addReaction("👎");

@@ -23,7 +23,6 @@ public class YellCommand implements CommandExecutor {
     public String onCommand(TextChannel channel, Message message, MessageAuthor author, String cmd,
             String content) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();
         I18n t = plugin.getTranslator();
         if (!RisingWorldCommandGuard.canUseCommand(command, message)) {
@@ -38,7 +37,7 @@ public class YellCommand implements CommandExecutor {
         // the message excluding the first 2 parts
         String response = message.getContent().split(" ", 2)[1];
 
-        server.broadcastYellMessage(response);
+        Server.broadcastYellMessage(response, 10, false);
         message.addReaction("✔");
 
         return null;

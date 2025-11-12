@@ -5,11 +5,6 @@
  */
 package de.omegazirkel.risingworld;
 
-import de.omegazirkel.risingworld.tools.Colors;
-import de.omegazirkel.risingworld.tools.FileChangeListener;
-import de.omegazirkel.risingworld.tools.I18n;
-import de.omegazirkel.risingworld.tools.PluginChangeWatcher;
-
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MINUTE;
@@ -20,21 +15,40 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
-// import java.util.Base64;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-// import java.util.Map;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
+import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
+import org.apache.hc.core5.concurrent.FutureCallback;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.nio.entity.BasicAsyncEntityProducer;
+import org.apache.hc.core5.http.nio.entity.AsyncEntityProducer;
+import org.json.simple.JSONObject;
+
+import de.omegazirkel.risingworld.tools.Colors;
+import de.omegazirkel.risingworld.tools.FileChangeListener;
+import de.omegazirkel.risingworld.tools.I18n;
+import de.omegazirkel.risingworld.tools.PluginChangeWatcher;
 import net.risingworld.api.Plugin;
 import net.risingworld.api.Server;
+import net.risingworld.api.definitions.Npcs;
+import net.risingworld.api.definitions.Npcs.Behaviour;
 import net.risingworld.api.events.EventMethod;
 import net.risingworld.api.events.Listener;
 import net.risingworld.api.events.npc.NpcDeathEvent;
@@ -54,20 +68,6 @@ import net.risingworld.api.objects.Npc;
 import net.risingworld.api.objects.Player;
 // import net.risingworld.api.objects.WorldItem;
 import net.risingworld.api.utils.Vector3f;
-import net.risingworld.api.utils.Definitions.NpcDefinition;
-import net.risingworld.api.utils.Definitions.ObjectDefinition;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONObject;
 
 /**
  *
@@ -75,7 +75,7 @@ import org.json.simple.JSONObject;
  */
 public class DiscordWebHook extends Plugin implements Listener, FileChangeListener {
 
-	public static final String pluginVersion = "0.15.6";
+	public static final String pluginVersion = "0.16.0";
 	public static final String pluginName = "DiscordPlugin";
 	static final String pluginCMD = "dp";
 
@@ -218,10 +218,9 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 		}
 		this.initSettings();
 		if (reportStatusEnabled) {
-			Server server = getServer();
 			String username = statusUsername;
 			if (useServerName) {
-				username = server.getName();
+				username = Server.getName();
 			}
 			this.sendDiscordMessage(username, statusEnabledMessage, webHookStatusUrl);
 		}
@@ -275,8 +274,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 					if (canTriggerRestart) {
 						String username = statusUsername;
 						if (useServerName) {
-							Server server = getServer();
-							username = server.getName();
+							username = Server.getName();
 						}
 						String msgDC = t.get("DC_SHUTDOWN", botLang).replace("PH_PLAYER", player.getName());
 						this.sendDiscordMessage(username, msgDC, webHookStatusUrl);
@@ -337,7 +335,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 					}
 					log.out("Taking screenshot with factor " + sizeFactor, 0);
 					final String msgToSend = supportMessage;
-					player.createScreenshot(sizeFactor, (BufferedImage bimg) -> {
+					player.createScreenshot(sizeFactor, 1, true, (BufferedImage bimg) -> {
 						final ByteArrayOutputStream os = new ByteArrayOutputStream();
 						try {
 							ImageIO.write(bimg, "jpg", os);
@@ -402,7 +400,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 				}
 				final String textToSend = noColorText.replace("+screen", "[screenshot.jpg]");
 				log.out("Taking screenshot with factor " + sizeFactor, 0);
-				player.createScreenshot(sizeFactor, (BufferedImage bimg) -> {
+				player.createScreenshot(sizeFactor, 1, true, (BufferedImage bimg) -> {
 					final ByteArrayOutputStream os = new ByteArrayOutputStream();
 					try {
 						ImageIO.write(bimg, "jpg", os);
@@ -432,7 +430,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 * @param noColorText
 	 */
 	private void broadcastChatMessage(Player eventPlayer, String noColorText) {
-		getServer().getAllPlayers().forEach((player) -> {
+		Player[] players = Server.getAllPlayers();
+		for (Player player : players) {
 			String color = colorLocalOther;
 			if (player.getUID() == eventPlayer.getUID()) {
 				color = colorLocalSelf;
@@ -447,8 +446,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			}
 
 			player.sendTextMessage(color + "[LOCAL] " + eventPlayer.getName() + group + ": " + c.text + noColorText);
-
-		});
+		}
 	}
 
 	/**
@@ -474,8 +472,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			Player player = event.getPlayer();
 			String username = statusUsername;
 			if (useServerName) {
-				Server server = getServer();
-				username = server.getName();
+				username = Server.getName();
 			}
 			this.sendDiscordMessage(username,
 					t.get("DC_PLAYER_CONNECTED", botLang).replace("PH_PLAYER", player.getName()), webHookStatusUrl);
@@ -490,19 +487,19 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	public void onPlayerDisconnect(PlayerDisconnectEvent event) {
 		if (postStatus) {
 			Player player = event.getPlayer();
-			Server server = getServer();
+
 			String username = statusUsername;
 			if (useServerName) {
-				username = server.getName();
+				username = Server.getName();
 			}
 			this.sendDiscordMessage(username,
 					t.get("DC_PLAYER_DISCONNECTED", botLang).replace("PH_PLAYER", player.getName()), webHookStatusUrl);
 			if (flagRestart) {
-				int playersLeft = server.getPlayerCount() - 1;
+				int playersLeft = Server.getPlayerCount() - 1;
 				if (playersLeft == 0) {
 					this.sendDiscordMessage(username, t.get("RESTART_PLAYER_LAST", botLang), webHookStatusUrl);
-					server.saveAll();
-					server.shutdown();
+					Server.saveAll();
+					Server.shutdown();
 				} else if (playersLeft > 1) {
 					this.broadcastMessage("BC_PLAYER_REMAIN", playersLeft);
 				}
@@ -516,13 +513,16 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 */
 	@EventMethod
 	public void onPlayerRemoveObject(PlayerRemoveObjectEvent event) {
-		ObjectDefinition def = event.getObjectDefinition();
-		Vector3f pos = event.getObjectPosition();
-		String posMap = ((int) pos.x) + (pos.x > 0 ? "W" : "E") + " " + ((int) pos.z) + (pos.z > 0 ? "N" : "S");
-		if (!def.isPickupable() || !trackPickupables)
+		boolean pickupable = event.getObjectDefinition().pickupable;
+		String name = event.getObjectDefinition().name;
+		int posX = event.getChunkPositionX();
+		int posY = event.getChunkPositionY();
+		int posZ = event.getChunkPositionZ();
+		String posMap = ((int) posX) + (posX > 0 ? "W" : "E") + " " + ((int) posZ) + (posZ > 0 ? "N" : "S");
+		if (!pickupable || !trackPickupables)
 			return;
 		String msg = t.get("BAT_OBJECT_REMOVE", botLang).replace("PH_PLAYER", event.getPlayer().getName())
-				.replace("PH_OBJECT_NAME", def.getName()).replace("PH_LOCATION", pos.x + " " + pos.y + " " + pos.z)
+				.replace("PH_OBJECT_NAME", name).replace("PH_LOCATION", posX + " " + posY + " " + posZ)
 				.replace("PH_MAP_COORDINATES", posMap);
 		log.out(msg, trackServerLogLevel);
 		this.sendDiscordMessage(statusUsername, msg, webHookEventUrl);
@@ -534,13 +534,16 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 */
 	@EventMethod
 	public void onPlayerDestroyObject(PlayerDestroyObjectEvent event) {
-		ObjectDefinition def = event.getObjectDefinition();
-		Vector3f pos = event.getObjectPosition();
-		String posMap = ((int) pos.x) + (pos.x > 0 ? "W" : "E") + " " + ((int) pos.z) + (pos.z > 0 ? "N" : "S");
-		if (!def.isPickupable() || !trackPickupables)
+		boolean pickupable = event.getObjectDefinition().pickupable;
+		String name = event.getObjectDefinition().name;
+		int posX = event.getChunkPositionX();
+		int posY = event.getChunkPositionY();
+		int posZ = event.getChunkPositionZ();
+		String posMap = ((int) posX) + (posX > 0 ? "W" : "E") + " " + ((int) posZ) + (posZ > 0 ? "N" : "S");
+		if (!pickupable || !trackPickupables)
 			return;
 		String msg = t.get("BAT_OBJECT_DESTROY", botLang).replace("PH_PLAYER", event.getPlayer().getName())
-				.replace("PH_OBJECT_NAME", def.getName()).replace("PH_LOCATION", pos.x + " " + pos.y + " " + pos.z)
+				.replace("PH_OBJECT_NAME", name).replace("PH_LOCATION", posX + " " + posY + " " + posZ)
 				.replace("PH_MAP_COORDINATES", posMap);
 		log.out(msg, trackServerLogLevel);
 		this.sendDiscordMessage(statusUsername, msg, webHookEventUrl);
@@ -556,7 +559,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 		// log.out("NPC DEATH EVENT: " + event.getCause().toString() + " / " +
 		// Cause.KilledByPlayer);
 		Npc npc = event.getNpc();
-		NpcDefinition def = npc.getDefinition();
+		String name = npc.getName();
 		Vector3f pos = event.getDeathPosition();
 		String posString = pos.x + " " + pos.y + " " + pos.z;
 		String posMap = ((int) pos.x) + (pos.x > 0 ? "W" : "E") + " " + ((int) pos.z) + (pos.z > 0 ? "N" : "S");
@@ -572,18 +575,18 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 		// log.out("|" + npc.getType() + "==" + Npc.Type.Animal + "&&" +
 		// trackNonHostileAnimalKill + "&&"
 		// + !npc.getDefinition().getBehaviour().equalsIgnoreCase("AGGRESSIVE"), 0);
-		if (npc.getType() == Npc.Type.Mount && trackMountKill) {
+		if (npc.getTypeID() == Npcs.Type.Mount.value && trackMountKill) {
 			// a mount was killed
 			String msg = t.get("BAT_KILL_MOUNT", botLang).replace("PH_PLAYER", player.getName())
-					.replace("PH_NPC_NAME", def.getName()).replace("PH_LOCATION", posString)
+					.replace("PH_NPC_NAME", name).replace("PH_LOCATION", posString)
 					.replace("PH_MAP_COORDINATES", posMap);
 			log.out(msg, trackServerLogLevel);
 			this.sendDiscordMessage(statusUsername, msg, webHookEventUrl);
-		} else if (npc.getType() == Npc.Type.Animal && trackNonHostileAnimalKill
-				&& !npc.getDefinition().getBehaviour().equalsIgnoreCase("AGGRESSIVE")) {
+		} else if (npc.getTypeID() == Npcs.Type.Animal.value && trackNonHostileAnimalKill
+				&& npc.getDefinition().behaviour.value != Behaviour.Aggressive.value) {
 			// Non agressive animal was killed
 			String msg = t.get("BAT_KILL_ANIMAL", botLang).replace("PH_PLAYER", player.getName())
-					.replace("PH_NPC_NAME", def.getName()).replace("PH_LOCATION", posString)
+					.replace("PH_NPC_NAME", name).replace("PH_LOCATION", posString)
 					.replace("PH_MAP_COORDINATES", posMap);
 			log.out(msg, trackServerLogLevel);
 
@@ -599,10 +602,9 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	public void onDisable() {
 		log.out("OmegaZirkel Discord Plugin deactivated", 10);
 		if (reportStatusDisabled) {
-			Server server = getServer();
 			String username = statusUsername;
 			if (useServerName) {
-				username = server.getName();
+				username = Server.getName();
 			}
 			this.sendDiscordMessage(username, statusDisabledMessage, webHookStatusUrl);
 		}
@@ -619,71 +621,106 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 * @param image
 	 */
 	private void sendDiscordMessage(String username, String text, String channel, byte[] image) {
-		try {
-			// Username Validation
-			username = username.replace("@", "").replace("@", "").replace(":", "").replace("`", ""); // remove invalid
-																										// chars
+		// Username Validation
+		username = username.replaceAll("[@:`]", "");
+		if (username.length() < 2)
+			username += "__";
+		if (username.length() > 32)
+			username = username.substring(0, 31);
 
-			if (username.length() < 2) {
-				username = username + "__";
-			}
-			if (username.length() > 32) {
-				username = username.substring(0, 31);
-			}
-			JSONObject json = new JSONObject();
+		JSONObject json = new JSONObject();
+		json.put("content", text);
+		json.put("username", username);
 
-			json.put("content", text);
-			json.put("username", username);
-			if (overrideAvatar) {
-				String avatar_url = "https://api.adorable.io/avatars/128/" + username.replace(" ", "%20");
-				json.put("avatar_url", avatar_url);
-			}
+		if (overrideAvatar) {
+			String avatarUrl = "https://api.adorable.io/avatars/128/" + username.replace(" ", "%20");
+			json.put("avatar_url", avatarUrl);
+		}
 
-			HttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPost post = new HttpPost(channel);
-			StringEntity stringObject = new StringEntity(json.toJSONString(), "UTF-8");
-			post.setHeader("Content-type", "application/json; charset=UTF-8");
-			post.setEntity(stringObject);
-			HttpResponse response = httpClient.execute(post);
-			int status = response.getStatusLine().getStatusCode();
-			if (status != 204) {
-				HttpEntity entity = response.getEntity();
-				String responseString = EntityUtils.toString(entity, "UTF-8");
-				log.out("HTTP Status: " + status + "\nResponse: " + responseString + "\nRequest was: " + stringObject,
-						0);
-			}
-			if (image != null) {
-				try {
-					// json.remove("content");
-					// json.put("file", image);
-					HttpPost imagePost = new HttpPost(channel);
-					MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-					builder.addTextBody("username", username, ContentType.TEXT_PLAIN);
-					if (overrideAvatar) {
-						builder.addTextBody("avatar_url",
-								"https://api.adorable.io/avatars/128/" + username.replace(" ", "%20"),
-								ContentType.TEXT_PLAIN);
+		try (CloseableHttpAsyncClient client = HttpAsyncClients.createDefault()) {
+			client.start();
+
+			// ---------- send text message ----------
+			SimpleHttpRequest post = SimpleHttpRequest.post(channel);
+			post.setBody(json.toJSONString(), ContentType.APPLICATION_JSON);
+
+			CompletableFuture<SimpleHttpResponse> textFuture = new CompletableFuture<>();
+
+			client.execute(post, new FutureCallback<>() {
+				@Override
+				public void completed(SimpleHttpResponse result) {
+					int status = result.getCode();
+					if (status != 204) {
+						log.out("Discord text response: " + status + "\n" + result.getBodyText(), 0);
 					}
-					builder.addBinaryBody("file", image, ContentType.APPLICATION_OCTET_STREAM, "screenshot.jpg");
-					HttpEntity multipart = builder.build();
-					//
-					imagePost.setEntity(multipart);
-					HttpResponse imageResponse = httpClient.execute(imagePost);
-					int imageStatus = imageResponse.getStatusLine().getStatusCode();
-					if (imageStatus != 204) {
-						HttpEntity entity = imageResponse.getEntity();
-						String responseString = EntityUtils.toString(entity, "UTF-8");
-						log.out("HTTP Status: " + status + "\nResponse: " + responseString + "\nRequest was: "
-								+ stringObject, 0);
-					}
-				} catch (Exception e) {
-					log.out("Exception on sendDiscordMessage: " + e.getMessage(), 100);
+					textFuture.complete(result);
 				}
+
+				@Override
+				public void failed(Exception ex) {
+					log.out("Discord text failed: " + ex.getMessage(), 100);
+					textFuture.completeExceptionally(ex);
+				}
+
+				@Override
+				public void cancelled() {
+					log.out("Discord text request cancelled", 100);
+					textFuture.cancel(true);
+				}
+			});
+
+			// ---------- Optional: Bildnachricht ----------
+			CompletableFuture<SimpleHttpResponse> imageFuture = new CompletableFuture<>();
+
+			if (image != null) {
+				MultipartEntityBuilder builder = MultipartEntityBuilder.create()
+						.setMode(HttpMultipartMode.STRICT)
+						.addTextBody("username", username, ContentType.TEXT_PLAIN);
+
+				if (overrideAvatar) {
+					builder.addTextBody("avatar_url",
+							"https://api.adorable.io/avatars/128/" + username.replace(" ", "%20"),
+							ContentType.TEXT_PLAIN);
+				}
+
+				builder.addBinaryBody("file", image, ContentType.IMAGE_JPEG, "screenshot.jpg");
+
+				AsyncEntityProducer producer = new BasicAsyncEntityProducer(builder.build());
+
+				SimpleHttpRequest imagePost = SimpleHttpRequest.post(channel);
+				imagePost.setBody(producer);
+
+				client.execute(imagePost, new FutureCallback<>() {
+					@Override
+					public void completed(SimpleHttpResponse result) {
+						int status = result.getCode();
+						if (status != 204) {
+							log.out("Discord image response: " + status + "\n" + result.getBodyText(), 0);
+						}
+						imageFuture.complete(result);
+					}
+
+					@Override
+					public void failed(Exception ex) {
+						log.out("Discord image failed: " + ex.getMessage(), 100);
+						imageFuture.completeExceptionally(ex);
+					}
+
+					@Override
+					public void cancelled() {
+						log.out("Discord image request cancelled", 100);
+						imageFuture.cancel(true);
+					}
+				});
+			} else {
+				imageFuture.complete(null);
 			}
-		} catch (IOException ex) {
-			log.out("IOException on sendDiscordMessage: " + ex.getMessage(), 100);
-		} catch (UnsupportedCharsetException | ParseException ex) {
-			log.out("Exception on sendDiscordMessage: " + ex.getMessage(), 100);
+
+			// ---------- optional wait ----------
+			CompletableFuture.allOf(textFuture, imageFuture).join();
+
+		} catch (Exception ex) {
+			log.out("Error initializing async client: " + ex.getMessage(), 100);
 		}
 	}
 
@@ -909,8 +946,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			restartTask = new TimerTask() {
 				@Override
 				public void run() {
-					Server server = getServer();
-					int playerNum = server.getAllPlayers().size();
+					int playerNum = Server.getPlayerCount();
 					if (playerNum > 0) {
 						log.out("Setting restart flag for scheduled server-restart", 10);
 						broadcastMessage("RS_SCHEDULE_INFO");
@@ -920,8 +956,8 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 						}
 					} else {
 						log.out("Restarting server now (scheduled)", 10);
-						server.saveAll();
-						server.shutdown();
+						Server.saveAll();
+						Server.shutdown();
 					}
 				}
 			};
@@ -938,12 +974,11 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 					@Override
 					public void run() {
 						log.out("Force server restart now!", 10);
-						Server server = getServer();
-						server.getAllPlayers().forEach(p -> {
-							p.kick("Server restart");
-						});
-						server.saveAll();
-						server.shutdown();
+						for (Player player : Server.getAllPlayers()) {
+							player.kick("Server restart");
+						}
+						Server.saveAll();
+						Server.shutdown();
 					}
 				};
 
@@ -965,7 +1000,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 * @param playerName
 	 */
 	private void broadcastMessage(String i18nIndex, String playerName) {
-		getServer().getAllPlayers().forEach((player) -> {
+		for (Player player : Server.getAllPlayers()) {
 			try {
 				String lang = player.getSystemLanguage();
 				player.sendTextMessage(c.warning + pluginName + ":> " + c.text
@@ -973,7 +1008,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		});
+		}
 	}
 
 	/**
@@ -982,7 +1017,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	 * @param number
 	 */
 	private void broadcastMessage(String i18nIndex, int number) {
-		getServer().getAllPlayers().forEach((player) -> {
+		for (Player player : Server.getAllPlayers()) {
 			try {
 				String lang = player.getSystemLanguage();
 				player.sendTextMessage(c.warning + pluginName + ":> " + c.text
@@ -990,7 +1025,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		});
+		}
 	}
 
 	/**
@@ -1009,15 +1044,14 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 	public void onFileCreateEvent(Path file) {
 		if (file.toString().endsWith("jar")) {
 			log.out(file + " file was changed, set restart flag (or restart if no player online)", 10);
-			Server server = getServer();
 			if (reportJarChanged) {
 				String username = statusUsername;
 				if (useServerName) {
-					username = server.getName();
+					username = Server.getName();
 				}
 				if (restartOnUpdate) {
 
-					if (server.getPlayerCount() > 0) {
+					if (Server.getPlayerCount() > 0) {
 						this.sendDiscordMessage(username,
 								t.get("UPDATE_FLAG", botLang).replace("PH_FILE", file.getFileName() + ""),
 								webHookStatusUrl);
@@ -1035,11 +1069,11 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 				}
 			}
 			if (restartOnUpdate) {
-				if (server.getPlayerCount() > 0) {
+				if (Server.getPlayerCount() > 0) {
 					flagRestart = true;
 				} else {
-					server.saveAll();
-					server.shutdown();
+					Server.saveAll();
+					Server.shutdown();
 				}
 			}
 		} else {
@@ -1052,10 +1086,9 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 		if (file.toString().endsWith("settings.properties")) {
 			log.out("Settings file was changed, reloading settings now", 10);
 			if (reportSettingsChanged) {
-				Server server = getServer();
 				String username = statusUsername;
 				if (useServerName) {
-					username = server.getName();
+					username = Server.getName();
 				}
 				this.sendDiscordMessage(username, t.get("UPDATE_SETTINGS", botLang), webHookStatusUrl);
 			}

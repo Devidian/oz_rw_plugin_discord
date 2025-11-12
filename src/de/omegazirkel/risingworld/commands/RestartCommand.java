@@ -12,6 +12,7 @@ import de.omegazirkel.risingworld.guards.RisingWorldCommandGuard;
 import de.omegazirkel.risingworld.tools.Colors;
 import de.omegazirkel.risingworld.tools.I18n;
 import net.risingworld.api.Server;
+import net.risingworld.api.objects.Player;
 
 public class RestartCommand implements CommandExecutor {
 
@@ -24,24 +25,24 @@ public class RestartCommand implements CommandExecutor {
             fullCommand }, description = description, async = true, privateMessages = false, usage = "/restart", showInHelpPage = true)
     public String onCommand(TextChannel channel, Message message, MessageAuthor author) {
         DiscordWebHook plugin = JavaCordBot.pluginInstance;
-        Server server = plugin.getServer();
         String lang = plugin.getBotLanguage();
         I18n t = plugin.getTranslator();
         if (!RisingWorldCommandGuard.canUseCommand(command, message)) {
             return null;
         }
-        int playersLeft = server.getPlayerCount();
+        int playersLeft = Server.getPlayerCount();
         if (playersLeft == 0) {
             message.addReaction("✔");
-            server.shutdown();
+            Server.shutdown();
             return t.get("CMD_OUT_RESTART_NOW", lang);
         } else {
 
-            server.getAllPlayers().forEach((p) -> {
+            for (Player p : Server.getAllPlayers()) {
                 String l = p.getSystemLanguage();
                 p.sendTextMessage(c.warning + DiscordWebHook.pluginName + ":>" + c.text
                         + t.get("BC_RESTART", l).replace("PH_DISCORDUSER", author.getDiscriminatedName()));
-            });
+            }
+            ;
             plugin.setFlagRestart(true);
             message.addReaction("✔");
             return t.get("CMD_OUT_RESTART_DELAY", lang).replace("PH_PLAYERS", playersLeft + "");
