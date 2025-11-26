@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
 
@@ -33,3 +34,111 @@ jobs:
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+=======
+name: Java CI with Maven (DiscordPlugin)
+
+on:
+  push:
+    branches: ["master"]
+    tags:
+      - "v*"
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Extract version from tag
+      - name: Extract version from tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          VERSION="${GITHUB_REF##*/}"   # v0.13.0
+          VERSION="${VERSION#v}"        # 0.13.0
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      # Update pom.xml version
+      - name: Update pom.xml version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          sed -i "s|<version>.*</version>|<version>${VERSION}</version>|" pom.xml
+
+      # Update plugin.yml version
+      - name: Update plugin.yml version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          sed -i "s|version: .*|version: ${VERSION}|" plugin.yml
+
+      # Set up JDK
+      - name: Set up JDK 20
+        uses: actions/setup-java@v4
+        with:
+          java-version: "20"
+          distribution: "temurin"
+          cache: maven
+
+      # Install PluginAPI + Tools locally
+      - name: Install Rising World PluginAPI locally
+        run: |
+          mvn -B install:install-file \
+            -Dfile=libs/PluginAPI.jar \
+            -DgroupId=net.risingworld \
+            -DartifactId=PluginAPI \
+            -Dversion=1.0.0 \
+            -Dpackaging=jar
+
+      - name: Install Tools plugin API
+        run: |
+          mvn -B install:install-file \
+            -Dfile=libs/OZ-Tools.jar \
+            -DgroupId=de.omegazirkel.risingworld \
+            -DartifactId=Tools \
+            -Dversion=0.9.0 \
+            -Dpackaging=jar
+
+      - name: Install GlobalIntercom plugin API
+        run: |
+          mvn -B install:install-file \
+            -Dfile=libs/OZ-GlobalIntercom.jar \
+            -DgroupId=de.omegazirkel.risingworld \
+            -DartifactId=GlobalIntercom \
+            -Dversion=0.12.4 \
+            -Dpackaging=jar
+
+      # Build Maven
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      # Upload ZIP artifact (only on tags)
+      - name: Upload DiscordPlugin ZIP
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v4
+        with:
+          name: discordplugin-zip
+          path: dist/*.zip
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: discordplugin-zip
+          path: .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "*.zip"
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+>>>>>>> b0a28ca (build,ci: gh-action-workflow added)
