@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- feat: new shortcut "+s " for screenshot to discord
+- feat: new shortcuts "+screennogui" / "+sng " for screenshot without gui
 - refactor: updated plugin for unity version
 
 ## [0.15.6] - 2021-06-02

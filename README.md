@@ -12,7 +12,8 @@
 - plugin detects changes to jar files and sets restart flag if you like. Can also report this to discord and ingame chat
 - players can type /joinDiscord to join your discord if you configure this
 - support messages now have a screenshot attached
-- normal chat messages wich contain `+screen` have a screenshot uploaded to discord
+- normal chat messages wich contain `+screen` or `+s ` (include space) have a screenshot uploaded to discord
+- normal chat messages wich contain `+screennogui` or `+sng ` (include space) have a screenshot without interface
 - `Badass Tracker` tracks kills (mounts, non hostile animals) and remove/destroy of objects
 - Public API for other plugins (status/event channel)
 - Multiple server restarts can be scheduled (sets restart flag and restarts if all players have left, sends message to all players to inform them)
@@ -35,32 +36,32 @@
 
 ## Commands discord
 
-| Command                      | Description                                                    |
-| ---------------------------- | -------------------------------------------------------------- |
-| **informative commands:**    |                                                                |
-| ?help                        | shows a list of all available commands                         |
-| ?version                     | show current version installed                                 |
-| ?online                      | show a list of all players currently online                    |
-| ?weather                     | shows the current ingame weather                               |
-| ?time                        | shows the current ingame time                                  |
-| ?banned                      | shows a list of banned players with name, UID and reason       |
-| **administrative commands:** |                                                                |
-| /restart                     | set restart flag to shutdown server after last player has left |
-| /support [PLAYERNAME] [TEXT] | sends a text message to a player (must be online)              |
-| /kick [PLAYERNAME] [REASON?] | kick player with an optional reason                            |
-| /ban [PLAYERNAME] [REASON?]  | ban a player with an optional reason                           |
-| /group [PLAYERNAME] [GROUP]  | set player group                                               |
-| /yell [TEXT]                 | send a text to the server as yell message                      |
-| /bc [TYPE] [TEXT]            | send a broadcast message with identifier [TYPE] to all players |
-| /unban [UID]                 | unban a player by his uid                                      |
-| /tptp [PLAYER_A] [PLAYER_B]  | teleport Player A to Player B if both are online               |
-| /mkadmin [PLAYER]            | grant player admin status                                      |
-| /unadmin [PLAYER]            | revoke player admin status                                     |
-| /setweather [Weather]        | set weather on the server                                      |
-| /settime [HOUR] [MINUTE]     | set current ingame time                                        |
-| /sethealth [PLAYER] [VALUE]  | set players health to value                                    |
-| /sethunger [PLAYER] [VALUE]  | set players hunger to value                                    |
-| /setthirst [PLAYER] [VALUE]  | set players thirst to value                                    |
+| Command                                 | Description                                                    |
+| --------------------------------------- | -------------------------------------------------------------- |
+| **informative commands:**               |                                                                |
+| /help                                   | shows a list of all available commands                         |
+| /online                                 | show a list of all players currently online                    |
+| /getversion                             | show current version installed                                 |
+| /getweather                             | shows the current ingame weather                               |
+| /gettime                                | shows the current ingame time                                  |
+| /getbanned                              | shows a list of banned players with name, UID and reason       |
+| **administrative commands:**            |                                                                |
+| /restart                                | set restart flag to shutdown server after last player has left |
+| /support [PLAYERNAME] [TEXT]            | sends a text message to a player (must be online)              |
+| /kick [PLAYERNAME] [REASON?]            | kick player with an optional reason                            |
+| /ban [PLAYERNAME] [REASON?]             | ban a player with an optional reason                           |
+| /group [PLAYERNAME] [GROUP]             | set player group                                               |
+| /yell [TEXT]                            | send a text to the server as yell message                      |
+| /bc [TYPE] [TEXT]                       | send a broadcast message with identifier [TYPE] to all players |
+| /unban [UID]                            | unban a player by his uid                                      |
+| /teleporttoplayer [PLAYER_A] [PLAYER_B] | teleport Player A to Player B if both are online               |
+| /mkadmin [PLAYER]                       | grant player admin status                                      |
+| /unadmin [PLAYER]                       | revoke player admin status                                     |
+| /setweather [Weather]                   | set weather on the server                                      |
+| /settime [HOUR] [MINUTE]                | set current ingame time                                        |
+| /sethealth [PLAYER] [VALUE]             | set players health to value                                    |
+| /sethunger [PLAYER] [VALUE]             | set players hunger to value                                    |
+| /setthirst [PLAYER] [VALUE]             | set players thirst to value                                    |
 
 ## Installation (prebuild)
 
@@ -71,31 +72,32 @@ Download the latest zip files from [here (shared)](https://github.com/Devidian/o
 Should look like this:
 
 ```css
-    ── RisingWorld
-        ├── plugins
+    ── dedicated-server
+        ├── Plugins
         │    ├── DiscordPlugin
         │    │    ├── i18n...
-        │    │    ├── lib...
         │    │    ├── HISTORY.de.md
         │    │    ├── HISTORY.md
         │    │    ├── OZ-DiscordPlugin.jar
         │    │    ├── README.de.md
         │    │    ├── README.md
         │    │    └── settings.properties
-        │    ├── shared
+        │    ├── OZTools
         │    │    ├── assets...
-        │    │    └── lib
-        │    │         ├── HISTORY.md
-        │    │         └── tools.jar
+        │    │    ├── lib
+        │    │    │    └── \*.jar
+        │    │    ├── HISTORY.md
+        │    │    ├── OZ-Tools.jar
+        │    │    ├── README.md
+        │    │    └── settings.properties
         :    :
 ```
 
 ## Build (Maven)
 
-You have to create a new folder in your projects parent folder called `libs` and insert `PluginAPI.jar` from RisingWorld.
-See also: https://forum.rising-world.net/thread/4743-getting-started/
+TODO
 
-### Installation after build:
+### Installation after build
 
 just copy `dist/DiscordPlugin` folder after build into your plugin folder, thats it!
 
@@ -103,60 +105,60 @@ just copy `dist/DiscordPlugin` folder after build into your plugin folder, thats
 
 The settings.properties contains all you need to configure this plugin
 
-| setting                           | default     | description                                                                                                        |
-| --------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------ |
-| **General plugin settings**       |             |                                                                                                                    |
-| logLevel                          | 0           | Logging to server console higher values means less output 0=all (debug)                                            |
-| restartOnUpdate                   | false       | if true, restart flag is set automatically if plugin file has changed on the server                                |
-| sendPluginWelcome                 | false       | -                                                                                                                  |
-| **JavaCord settings**             |             |                                                                                                                    |
-| botEnable                         | false       | Enables usage of DiscordBot                                                                                        |
-| botSecure                         | true        | Only Bot owner can use commands if `true`                                                                          |
-| botToken                          |             | the token for your bot                                                                                             |
-| botLang                           | en          | -                                                                                                                  |
-| botChatChannelName                | server-chat | -                                                                                                                  |
-| botAdmins                         |             | -                                                                                                                  |
-| **other plugin settings**         |             |                                                                                                                    |
-| allowRestart                      | false       | if true, normal players are allowed to use /ozrestart after they played `restartMinimumTime` seconds on the server |
-| restartMinimumTime                | 86400       | player must play at least this time in seconds to use restart feature                                              |
-| allowScreenshots                  | true        | -                                                                                                                  |
-| joinDiscord                       |             | the code to join discord (not the full url!)                                                                       |
-| restartTimed                      | false       | enable or disable scheduled restart feature                                                                        |
-| restartTimes                      | 00:00       | set restart times for scheduled restart use hh:mm to add multiple values split them with a pipe                    |
-| forceRestartAfter                 | 0           | force restart after this time (minutes) (0 if you do not want to force restart)                                    |
-| **Chat settings**                 |             |                                                                                                                    |
-| postChat                          | false       | if true, chat is posted to the webHook for Chat                                                                    |
-| webHookChatUrl                    |             | this is the webHook used for ingame chat                                                                           |
-| overrideAvatar                    | true        | -                                                                                                                  |
-| **Status settings**               |             |                                                                                                                    |
-| postStatus                        | false       | if true, server status messages like player login/out is send to the webHook for Status                            |
-| useServerName                     | false       | if true, the servername is used as username for status posts                                                       |
-| reportStatusEnabled               | true        | if true, a message will be posted when the plugin is enabled (server boot)                                         |
-| reportStatusDisabled              | true        | if true, a message will be posted when the plugin is disabled (server shutdown)                                    |
-| reportSettingsChanged             | true        | if true, a message will be posted if settings.properties has changed                                               |
-| reportJarChanged                  | true        | if true, a message will be posted if the jar file has changed (plugin update for example)                          |
-| statusEnabledMessage              |             | the message that will be posted to discord on plugin enable                                                        |
-| statusDisabledMessage             |             | the message that will be posted to discord on plugin disable                                                       |
-| statusUsername                    |             | the fixed username to use for status messages                                                                      |
-| webHookStatusUrl                  |             | this is the webHook used for status messages                                                                       |
-| **Support settings**              |             |                                                                                                                    |
-| postSupport                       | false       | -                                                                                                                  |
-| supportScreenshot                 | true        | -                                                                                                                  |
-| webHookSupportUrl                 |             | this is the webHook used for support messages                                                                      |
-| addTeleportCommand                | true        | if true, a teleport command is added to the support message                                                        |
-| **Color & Chat settings**         |             |                                                                                                                    |
-| maxScreenWidth                    | 1920        | -                                                                                                                  |
-| colorizeChat                      | true        | -                                                                                                                  |
-| showGroup                         | false       | -                                                                                                                  |
-| colorSupport                      | [#782d8e]   | -                                                                                                                  |
-| colorLocalSelf                    | [#ddffdd]   | -                                                                                                                  |
-| colorLocalAdmin                   | [#db3208]   | -                                                                                                                  |
-| colorLocalOther                   | [#dddddd]   | -                                                                                                                  |
-| colorLocalDiscord                 | [#ddddff]   | -                                                                                                                  |
-| **Badass/Event Tracker settings** |             |                                                                                                                    |
-| postTrackedEvents                 | false       | -                                                                                                                  |
-| webHookEventUrl                   |             | -                                                                                                                  |
-| trackServerLogLevel               | 100         | -                                                                                                                  |
-| trackMountKill                    | false       | -                                                                                                                  |
-| trackNonHostileAnimalKill         | false       | -                                                                                                                  |
-| trackPickupables                  | false       | -                                                                                                                  |
+| setting                           | default         | description                                                                                                        |
+| --------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **General plugin settings**       |                 |                                                                                                                    |
+| logLevel                          | 0               | Logging to server console higher values means less output 0=all (debug)                                            |
+| restartOnUpdate                   | false           | if true, restart flag is set automatically if plugin file has changed on the server                                |
+| sendPluginWelcome                 | false           | -                                                                                                                  |
+| **JavaCord settings**             |                 |                                                                                                                    |
+| botEnable                         | false           | Enables usage of DiscordBot                                                                                        |
+| botSecure                         | true            | Only Bot owner can use commands if `true`                                                                          |
+| botToken                          |                 | the token for your bot                                                                                             |
+| botLang                           | en              | -                                                                                                                  |
+| botChatChannelName                | server-chat     | -                                                                                                                  |
+| botAdmins                         |                 | -                                                                                                                  |
+| **other plugin settings**         |                 |                                                                                                                    |
+| allowRestart                      | false           | if true, normal players are allowed to use /ozrestart after they played `restartMinimumTime` seconds on the server |
+| restartMinimumTime                | 86400           | player must play at least this time in seconds to use restart feature                                              |
+| allowScreenshots                  | true            | -                                                                                                                  |
+| joinDiscord                       |                 | the code to join discord (not the full url!)                                                                       |
+| restartTimed                      | false           | enable or disable scheduled restart feature                                                                        |
+| restartTimes                      | 00:00           | set restart times for scheduled restart use hh:mm to add multiple values split them with a pipe                    |
+| forceRestartAfter                 | 0               | force restart after this time (minutes) (0 if you do not want to force restart)                                    |
+| **Chat settings**                 |                 |                                                                                                                    |
+| postChat                          | false           | if true, chat is posted to the webHook for Chat                                                                    |
+| webHookChatUrl                    |                 | this is the webHook used for ingame chat                                                                           |
+| overrideAvatar                    | true            | -                                                                                                                  |
+| **Status settings**               |                 |                                                                                                                    |
+| postStatus                        | false           | if true, server status messages like player login/out is send to the webHook for Status                            |
+| useServerName                     | false           | if true, the servername is used as username for status posts                                                       |
+| reportStatusEnabled               | true            | if true, a message will be posted when the plugin is enabled (server boot)                                         |
+| reportStatusDisabled              | true            | if true, a message will be posted when the plugin is disabled (server shutdown)                                    |
+| reportSettingsChanged             | true            | if true, a message will be posted if settings.properties has changed                                               |
+| reportJarChanged                  | true            | if true, a message will be posted if the jar file has changed (plugin update for example)                          |
+| statusEnabledMessage              |                 | the message that will be posted to discord on plugin enable                                                        |
+| statusDisabledMessage             |                 | the message that will be posted to discord on plugin disable                                                       |
+| statusUsername                    |                 | the fixed username to use for status messages                                                                      |
+| webHookStatusUrl                  |                 | this is the webHook used for status messages                                                                       |
+| **Support settings**              |                 |                                                                                                                    |
+| postSupport                       | false           | -                                                                                                                  |
+| supportScreenshot                 | true            | -                                                                                                                  |
+| webHookSupportUrl                 |                 | this is the webHook used for support messages                                                                      |
+| addTeleportCommand                | true            | if true, a teleport command is added to the support message                                                        |
+| **Color & Chat settings**         |                 |                                                                                                                    |
+| maxScreenWidth                    | 1920            | -                                                                                                                  |
+| colorizeChat                      | true            | -                                                                                                                  |
+| showGroup                         | false           | -                                                                                                                  |
+| colorSupport                      | <color=#782d8e> | -                                                                                                                  |
+| colorLocalSelf                    | <color=#ddffdd> | -                                                                                                                  |
+| colorLocalAdmin                   | <color=#db3208> | -                                                                                                                  |
+| colorLocalOther                   | <color=#dddddd> | -                                                                                                                  |
+| colorLocalDiscord                 | <color=#ddddff> | -                                                                                                                  |
+| **Badass/Event Tracker settings** |                 |                                                                                                                    |
+| postTrackedEvents                 | false           | -                                                                                                                  |
+| webHookEventUrl                   |                 | -                                                                                                                  |
+| trackServerLogLevel               | 100             | -                                                                                                                  |
+| trackMountKill                    | false           | -                                                                                                                  |
+| trackNonHostileAnimalKill         | false           | -                                                                                                                  |
+| trackPickupables                  | false           | -                                                                                                                  |

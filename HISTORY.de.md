@@ -1,5 +1,9 @@
 # History
 
+DEPRECATED FILE
+
+Das changelog wird nur noch auf englisch fortgeführt [hier klicken](HISTORY.md)
+
 ## [Unreleased]
 
 ## [0.15.6] - 2021-06-02

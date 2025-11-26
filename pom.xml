@@ -5,7 +5,7 @@
 
     <groupId>de.omegazirkel.risingworld</groupId>
     <artifactId>DiscordPlugin</artifactId>
-    <version>0.16.0</version>
+    <version>0.16.6</version>
     <packaging>jar</packaging>
 
     <!-- Repositories -->
@@ -22,18 +22,6 @@
     </repositories>
 
     <dependencies>
-        <!-- Discord Command Framework -->
-        <dependency>
-            <groupId>de.btobastian.sdcf4j</groupId>
-            <artifactId>sdcf4j-core</artifactId>
-            <version>1.0.10</version>
-        </dependency>
-
-        <dependency>
-            <groupId>de.btobastian.sdcf4j</groupId>
-            <artifactId>sdcf4j-javacord</artifactId>
-            <version>1.0.10</version>
-        </dependency>
 
         <!-- Javacord -->
         <dependency>
@@ -41,13 +29,7 @@
             <artifactId>javacord</artifactId>
             <version>3.8.0</version>
             <type>pom</type>
-        </dependency>
-
-        <!-- Logging -->
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.3.5</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Apache HttpClient 5 (async + multipart + reactive) -->
@@ -55,12 +37,14 @@
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
             <version>5.4</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5-fluent</artifactId>
             <version>5.4</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- JSON -->
@@ -68,39 +52,38 @@
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- OZ Plugins -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>GlobalIntercom</artifactId>
+            <version>0.12.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>Tools</artifactId>
+            <version>0.8.12</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Rising World PluginAPI -->
         <dependency>
             <groupId>net.risingworld</groupId>
             <artifactId>PluginAPI</artifactId>
-            <version>0.9.6</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/../libs/PluginAPI.jar</systemPath>
-        </dependency>
-
-        <!-- OZ Plugins -->
-        <dependency>
-            <groupId>de.omegazirkel.risingworld</groupId>
-            <artifactId>OZ-GlobalIntercom-Plugin</artifactId>
-            <version>0.7.2-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/../libs/OZ-GlobalIntercom-Plugin.jar</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>de.omegazirkel.risingworld</groupId>
-            <artifactId>tools</artifactId>
-            <version>0.7.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/../libs/tools-0.7.0.jar</systemPath>
+            <version>1.0.0</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
     <build>
         <sourceDirectory>src</sourceDirectory>
         <directory>target</directory>
-        <finalName>OZ-DiscordPlugin</finalName>
+        <finalName>OZ-${project.artifactId}</finalName>
+
         <resources>
             <resource>
                 <targetPath>resources</targetPath>
@@ -112,17 +95,44 @@
         </resources>
 
         <plugins>
-            <!-- JAR packaging -->
+
+            <!-- clear DiscordPlugin directory -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.3.2</version>
                 <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Class-Path>../shared/lib/tools.jar</Class-Path>
-                        </manifestEntries>
-                    </archive>
+                    <filesets>
+                        <fileset>
+                            <directory>${project.basedir}/dist/${project.artifactId}</directory>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <id>install-local</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${project.build.directory}/${project.build.finalName}.jar</file>
+                            <groupId>de.omegazirkel</groupId>
+                            <artifactId>${project.build.finalName}</artifactId>
+                            <version>${project.version}</version>
+                            <packaging>jar</packaging>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -130,12 +140,11 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <release>21</release>
-                    <source>21</source>
-                    <target>21</target>
+                    <release>20</release>
+                    <source>20</source>
+                    <target>20</target>
                 </configuration>
             </plugin>
-
 
             <!-- Dependency copying -->
             <plugin>
@@ -152,8 +161,9 @@
                         <configuration>
                             <outputDirectory>${basedir}/dist/${project.artifactId}/lib</outputDirectory>
                             <excludeTypes>pom</excludeTypes>
-                            <excludeScope>system</excludeScope>
+                            <excludeScope>provided</excludeScope>
                             <overWriteIfNewer>true</overWriteIfNewer>
+                            <!-- <excludeTransitive>true</excludeTransitive> -->
                         </configuration>
                     </execution>
                 </executions>
@@ -162,13 +172,91 @@
             <!-- Resource copying -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.7</version>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-resource-one</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/dist/${project.artifactId}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src</directory>
+                                    <includes>
+                                        <include>*.properties</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}</directory>
+                                    <includes>
+                                        <include>*.md</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/target</directory>
+                                    <includes>
+                                        <include>${project.build.finalName}.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resource-two</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/dist/${project.artifactId}/i18n</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/i18n</directory>
+                                    <includes>
+                                        <include>**/*.properties</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>zip-dist-DiscordPlugin</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${project.artifactId}-${project.version}</finalName>
+
+                            <!-- Important: Inline descriptor -->
+                            <descriptors>
+                                <descriptor>src/assembly/DiscordPlugin.xml</descriptor>
+                            </descriptors>
+
+                            <outputDirectory>${project.basedir}/dist</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.source>20</maven.compiler.source>
+        <maven.compiler.target>20</maven.compiler.target>
+        <maven.compiler.release>20</maven.compiler.release>
     </properties>
 </project>
