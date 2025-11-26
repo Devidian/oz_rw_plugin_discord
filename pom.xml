@@ -19,6 +19,18 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repositories>
+            <repository>
+                <id>github-oz-tools</id>
+                <url>https://maven.pkg.github.com/Devidian/oz_rw_plugin_tools</url>
+            </repository>
+
+            <repository>
+                <id>github-oz-globalintercom</id>
+                <url>https://maven.pkg.github.com/Devidian/oz_rw_plugin_global_intercom</url>
+            </repository>
+        </repositories>
+
     </repositories>
 
     <dependencies>
@@ -61,6 +73,7 @@
             <artifactId>GlobalIntercom</artifactId>
             <version>0.12.4</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -118,48 +131,48 @@
                 <artifactId>maven-install-plugin</artifactId>
                 <version>3.1.1</version>
                 <executions>
-					<execution>
-						<id>install-api-lib</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<configuration>
-							<file>${project.basedir}/libs/PluginAPI.jar</file>
-							<groupId>net.risingworld</groupId>
-							<artifactId>PluginAPI</artifactId>
-							<version>1.0.0</version>
-							<packaging>jar</packaging>
-						</configuration>
-					</execution>
-					<execution>
-						<id>install-tools-plugin</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<configuration>
-							<file>${project.basedir}/libs/OZ-Tools.jar</file>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>Tools</artifactId>
-							<version>0.9.0</version>
-							<packaging>jar</packaging>
-						</configuration>
-					</execution>
-					<execution>
-						<id>install-gi-plugin</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<configuration>
-							<file>${project.basedir}/libs/OZ-GlobalIntercom.jar</file>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>GlobalIntercom</artifactId>
-							<version>0.12.4</version>
-							<packaging>jar</packaging>
-						</configuration>
-					</execution>
+                    <execution>
+                        <id>install-api-lib</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${project.basedir}/libs/PluginAPI.jar</file>
+                            <groupId>net.risingworld</groupId>
+                            <artifactId>PluginAPI</artifactId>
+                            <version>1.0.0</version>
+                            <packaging>jar</packaging>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-tools-plugin</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${project.basedir}/libs/OZ-Tools.jar</file>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>Tools</artifactId>
+                            <version>0.9.0</version>
+                            <packaging>jar</packaging>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-gi-plugin</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${project.basedir}/libs/OZ-GlobalIntercom.jar</file>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>GlobalIntercom</artifactId>
+                            <version>0.12.4</version>
+                            <packaging>jar</packaging>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>install-local</id>
                         <phase>install</phase>

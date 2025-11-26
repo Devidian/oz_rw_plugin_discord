@@ -249,7 +249,13 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			logger().info("ℹ️ Global Intercom found! ID: " + pluginGlobalIntercom.getID());
 		}
 		this.initSettings();
+		this.initialize();
+	}
 
+	private void initialize() {
+		// only execute if DiscordBot was not yet initialized
+		if (DiscordBot != null)
+			return;
 		if (!botEnable) {
 			logger().warn("❌ DiscordBot is disabled");
 			return;
@@ -1345,6 +1351,7 @@ public class DiscordWebHook extends Plugin implements Listener, FileChangeListen
 			this.sendDiscordStatusMessage(t.get("UPDATE_SETTINGS", botLang));
 		}
 		initSettings(settingsPath.toString());
+		this.initialize();
 	}
 
 	public static void shutdown() {
